@@ -6,25 +6,12 @@ export default {
 	name: "连接",
 	action: function() {
 		console.log('调用连接方法')
-		connect({
-			token,
-			success: (userId) => {
-				addSuccessResult({
-					title: '连接成功',
-					data: `userid: ${userId}`
-				})
-			},
-			error: (errCode) => {
-				addSuccessResult({
-					title: '连接失败',
-					data: errCode
-				})
-			},
-			tokenIncorrect: (errCode) => {
-				addWarnResult({
-					title: 'tokenIncorrect'
-				})
-			},
+		connect('xx', (result) => {
+			console.log(result)
+			addSuccessResult({
+				title: '连接成功',
+				data: result
+			})
 		})
 	}
 }

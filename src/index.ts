@@ -35,59 +35,59 @@ import {
   MessageObjectNames
 } from './types'
 
-// const RCIMLibUni = uni.requireNativePlugin('imlib原生插件名称')
-const RCIMLibUni = {NativeEventEmitter: {}, NativeModules: {}} // 原生开发时删掉这一行
+const RCIMClient = uni.requireNativePlugin('RCUniIM')
+// const RCIMLibUni = {NativeEventEmitter: {}, NativeModules: {}} // 原生开发时删掉这一行
 
-const RichAlert = uni.requireNativePlugin('DCloud-RichAlert')
-const { NativeEventEmitter, NativeModules } = RCIMLibUni
+// const RichAlert = uni.requireNativePlugin('DCloud-RichAlert')
+// const { NativeEventEmitter, NativeModules } = RCIMLibUni
 
 export * from './types'
 
-const RCIMClient: any = {}
+// const RCIMClient: any = {}
 const eventEmitter: any = {}
 // const RCIMClient = NativeModules.RCIMClient
 // const eventEmitter = new NativeEventEmitter(RCIMClient)
 
-export function test () {
-  return new Promise((resolve) => {
-    RichAlert.show({
-      position: 'bottom',
-      title: '提示信息',
-      titleColor: '#FF0000',
-      content: '这是原生插件，点击确定调用回调',
-      contentAlign: 'left',
-      buttons: [
-        {
-          title: '否'
-        },
-        {
-          title: '确认',
-          titleColor: '#3F51B5'
-        }
-      ]
-    }, (result: any) => {
-      switch (result.index) {
-        case 0:
-          resolve({
-            code: 200,
-            data: {
-              info: '返回错误信息',
-              info2: '返回错误信息2'
-            }
-          })
-          break
-        case 1:
-          resolve({
-            code: 0,
-            data: {
-              info: '返回信息',
-              info2: '返回信息2'
-            }
-          })
-      }
-    })
-  })
-}
+// export function test () {
+//   return new Promise((resolve) => {
+//     RichAlert.show({
+//       position: 'bottom',
+//       title: '提示信息',
+//       titleColor: '#FF0000',
+//       content: '这是原生插件，点击确定调用回调',
+//       contentAlign: 'left',
+//       buttons: [
+//         {
+//           title: '否'
+//         },
+//         {
+//           title: '确认',
+//           titleColor: '#3F51B5'
+//         }
+//       ]
+//     }, (result: any) => {
+//       switch (result.index) {
+//         case 0:
+//           resolve({
+//             code: 200,
+//             data: {
+//               info: '返回错误信息',
+//               info2: '返回错误信息2'
+//             }
+//           })
+//           break
+//         case 1:
+//           resolve({
+//             code: 0,
+//             data: {
+//               info: '返回信息',
+//               info2: '返回信息2'
+//             }
+//           })
+//       }
+//     })
+//   })
+// }
 
 /**
  * 初始化 SDK，只需要调用一次
@@ -95,7 +95,7 @@ export function test () {
  * @param appKey 从融云开发者平台创建应用后获取到的 App Key
  */
 export function init (appKey: string) {
-  RCIMClient.init(appKey)
+  RCIMClient.init('pvxdm17jpwibr')
 }
 
 /**
@@ -184,24 +184,31 @@ export function setStatisticServer (server: string) {
  */
 export function connect (
   token: string,
-  success?: (userId: string) => void,
-  error?: (errorCode: ConnectErrorCode) => void,
-  tokenIncorrect?: () => void
+  callback?: (result: any) => void
 ) {
-  const eventId = Math.random().toString()
-  const listener = eventEmitter.addListener('rcimlib-connect', (data: any) => {
-    if (data.eventId === eventId) {
-      if (data.type === 'success') {
-        success && success(data.userId)
-      } else if (data.type === 'error') {
-        error && error(data.errorCode)
-      } else if (data.type === 'tokenIncorrect') {
-        tokenIncorrect && tokenIncorrect()
-      }
-      listener.remove()
+  // const eventId = Math.random().toString()
+  // const listener = eventEmitter.addListener('rcimlib-connect', (data: any) => {
+  //   if (data.eventId === eventId) {
+  //     if (data.type === 'success') {
+  //       success && success(data.userId)
+  //     } else if (data.type === 'error') {
+  //       error && error(data.errorCode)
+  //     } else if (data.type === 'tokenIncorrect') {
+  //       tokenIncorrect && tokenIncorrect()
+  //     }
+  //     listener.remove()
+  //   }
+  // })
+  // RCIMClient.connect(token, eventId)
+  // RCIMClient.connect(token, callback)
+  RCIMClient.connect('H6CWDkr0gQe1/Ur2Mc9iie4NvAylVHKsAYpTpwSJmEg=@4x5h.cn.rongnav.com;4x5h.cn.rongcfg.com', async (ret: any)=> {
+    if (ret.error === 0) {
+      console.log(ret.userId)
+    }else {
+      console.log(ret.error)
     }
+    callback && callback(ret)
   })
-  RCIMClient.connect(token, eventId)
 }
 
 /**
