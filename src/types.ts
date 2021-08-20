@@ -484,6 +484,7 @@ export interface ReceiveMessage {
  * 连接错误代码
  */
 export enum ConnectErrorCode {
+  RC_SUCCESS = 0,
   RC_NET_CHANNEL_INVALID = 30001,
   RC_NET_UNAVAILABLE = 30002,
   RC_NAVI_REQUEST_FAIL = 30004,
@@ -592,6 +593,11 @@ export enum ConnectionStatusAndroid {
  */
 export type ConnectionStatus = ConnectionStatusIOS | ConnectionStatusAndroid;
 
+
+export interface ConnectResult {
+  error: ConnectErrorCode,
+  userId?: number
+}
 /**
  * 要发送的消息
  */

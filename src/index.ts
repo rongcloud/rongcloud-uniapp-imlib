@@ -33,7 +33,8 @@ import {
   PushLanguage,
   PushNotificationMessage,
   MessageObjectNames,
-  IUniListener
+  IUniListener,
+  ConnectResult
 } from './types'
 
 const RCIMClient = uni.requireNativePlugin('RCUniIM')
@@ -179,16 +180,12 @@ export function setStatisticServer (server: string) {
  * 除非您已经手动将连接断开，否则您不需要自己再手动重连。
  *
  * @param token 从服务端获取的用户身份令牌（Token）
- * @param callback 成功回调函数
  */
 export function connect (
   token: string,
-  callback: (result: any) => void
+  callback: (result: ConnectResult) => void
 ) {
-  console.log(token)
-  RCIMClient.connect(token, (ret: any)=> {
-    callback && callback(ret)
-  })
+  RCIMClient.connect(token, callback)
 }
 
 
