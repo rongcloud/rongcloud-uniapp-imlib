@@ -1,21 +1,20 @@
-import test from './test.js'
-import init from "./init.js"
-import connect from "./connect.js"
-import getConversationList from "./getConversationList.js"
+
+import { rcInit, rcConnect, rcDisconnect } from "./base.js"
+import { rcGetConversationList } from './conversation.js'
 
 export default [
 	{
 		title: '基础接口',
 		list: [
-			test,
-			init,
-			connect
+			rcInit,
+			rcConnect,
+			rcDisconnect
 		]
 	},
 	{
 		title: '会话接口',
 		list: [
-			getConversationList
+			rcGetConversationList
 		]
 	}
 ]

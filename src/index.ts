@@ -32,7 +32,8 @@ import {
   CSLeaveMessageItem,
   PushLanguage,
   PushNotificationMessage,
-  MessageObjectNames
+  MessageObjectNames,
+  IUniListener
 } from './types'
 
 const RCIMClient = uni.requireNativePlugin('RCUniIM')
@@ -95,7 +96,7 @@ const eventEmitter: any = {}
  * @param appKey 从融云开发者平台创建应用后获取到的 App Key
  */
 export function init (appKey: string) {
-  RCIMClient.init('pvxdm17jpwibr')
+  RCIMClient.init(appKey)
 }
 
 /**
@@ -178,38 +179,18 @@ export function setStatisticServer (server: string) {
  * 除非您已经手动将连接断开，否则您不需要自己再手动重连。
  *
  * @param token 从服务端获取的用户身份令牌（Token）
- * @param success 成功回调函数
- * @param error 失败回调函数
- * @param tokenIncorrect token 错误或过期回调函数
+ * @param callback 成功回调函数
  */
 export function connect (
   token: string,
-  callback?: (result: any) => void
+  callback: (result: any) => void
 ) {
-  // const eventId = Math.random().toString()
-  // const listener = eventEmitter.addListener('rcimlib-connect', (data: any) => {
-  //   if (data.eventId === eventId) {
-  //     if (data.type === 'success') {
-  //       success && success(data.userId)
-  //     } else if (data.type === 'error') {
-  //       error && error(data.errorCode)
-  //     } else if (data.type === 'tokenIncorrect') {
-  //       tokenIncorrect && tokenIncorrect()
-  //     }
-  //     listener.remove()
-  //   }
-  // })
-  // RCIMClient.connect(token, eventId)
-  // RCIMClient.connect(token, callback)
-  RCIMClient.connect('H6CWDkr0gQe1/Ur2Mc9iie4NvAylVHKsAYpTpwSJmEg=@4x5h.cn.rongnav.com;4x5h.cn.rongcfg.com', async (ret: any)=> {
-    if (ret.error === 0) {
-      console.log(ret.userId)
-    }else {
-      console.log(ret.error)
-    }
+  console.log(token)
+  RCIMClient.connect(token, (ret: any)=> {
     callback && callback(ret)
   })
 }
+
 
 /**
  * 断开与融云服务器的连接
@@ -495,7 +476,11 @@ export function downloadMediaMessage (messageId: number, callback: MediaMessageC
  * 添加连接状态监听函数
  */
 export function addConnectionStatusListener (listener: (status: ConnectionStatus) => void) {
-  return eventEmitter.addListener('rcimlib-connection-status', listener)
+  // return eventEmitter.addListener('rcimlib-connection-status', listener)
+  RCIMClient.addEventListener("rcimlib-connection-status", (result: IUniListener) => {
+    console.log(result)
+    listener(result.data as any)
+  });
 }
 
 /**

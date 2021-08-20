@@ -1023,3 +1023,14 @@ export interface PushNotificationMessage {
   conversationType: ConversationType;
   extra: string;
 }
+
+/**
+ * uni监听
+ */
+export interface IUniListener {
+  type: string,
+  module: string,
+  data: {
+    status: number
+  }
+}
