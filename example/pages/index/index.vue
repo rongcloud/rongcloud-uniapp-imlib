@@ -1,35 +1,22 @@
 <template>
 	<view class="">
 		<uni-collapse accordion>
-		    <!-- <uni-collapse-item :title="item.title" v-for="(item, index) in interfaceList" :key="index">
-		        <view class="content">
-		        	<view v-for="(inter, _index) in item.list"
-		        		:key="_index">
-		        		<button
-		        			type="default" 
-		        			size="mini"
-		        			class="btn"
-							@click="inter.action"
-		        		>{{inter.name}}</button>
-		        	</view>
-		        </view>
-		    </uni-collapse-item> -->
-			<uni-collapse-item :title="item.title" v-for="(item, index) in functionList" :key="index">
+			<uni-collapse-item :title="item.title + '(' + item.list.length + ')'" v-for="(item, index) in functionList" :key="index">
 			    <view class="content">
 			    	<view v-for="(inter, _index) in item.list"
 			    		:key="_index">
-			    	<!-- 	<button
+			    		<button
 			    			type="default" 
 			    			size="mini"
 			    			class="btn"
-							@click="showForm(inter)"
-			    		>{{inter.name}}</button> -->
-						<button
+							@click="() => { inter.params && inter.params.length ? showForm(inter) : inter.action()}"
+			    		>{{inter.name}}</button>
+						<!-- <button
 							type="default" 
 							size="mini"
 							class="btn"
 							@click="inter.action"
-						>{{inter.name}}</button>
+						>{{inter.name}}</button> -->
 			    	</view>
 			    </view>
 			</uni-collapse-item>
@@ -79,16 +66,20 @@
 					<view  v-if="curFormVisible">
 						<view class="" v-for="(item, index) in curFormInfo.params" style="margin-bottom: 10px;">
 							<view class="">
-								{{item.name}}
+								{{item.key}}:
 							</view>
 							<view class="" v-if="item.type === 'boolean'">
-								<checkbox :value="index" :checked="item.value" />
+								<!-- <checkbox :value="index" :checked="item.value" /> -->
+								<switch :checked="item.value" @change="switchChange(item.key, !item.value)" />
 							</view>
 							<view class="" v-else-if="item.type === 'number'">
-								<input  type="number" v-model="item.value" :placeholder="'请输入' + item.name" />
+								<input  type="number" v-model="item.value" :placeholder="'请输入' + item.key" style="border: 1px solid #999999;padding: 3px"/>
+							</view>
+							<view class="" v-else-if="item.type === 'textarea'">
+								<textarea v-model="item.value" :placeholder="'请输入' + item.key" style="border: 1px solid #999999;padding: 3px"/>
 							</view>
 							<view class="" v-else>
-								<input  type="text" v-model="item.value" :placeholder="'请输入' + item.name" />
+								<input  type="text" v-model="item.value" :placeholder="'请输入' + item.key" maxlength="-1" style="border: 1px solid #999999;padding: 3px"/>
 							</view>
 						</view>
 					</view>
@@ -104,7 +95,7 @@
 	import functionList from '../../function/index.js'
 	import {resultList} from '../../util/common.js'
 	import { statusColor, isObject, isArray } from '../../util/utils.js'
-	
+	import config from '../../config/config.js'
 	// import wgJsonView from '@/components/wg-json-view/wg-json-view.vue';
 	
 	export default {
@@ -121,7 +112,7 @@
 			}
 		},
 		onLoad() {
-
+			
 		},
 		computed: {},
 		methods: {
@@ -149,10 +140,18 @@
 				this.curFormInfo.params && this.curFormInfo.params.forEach((item) => {
 					params[item.key] = item.value
 				})
+				console.log(params)
 				this.curFormInfo.action && this.curFormInfo.action(params)
 				this.$refs.formPopup.close()
 				this.curFormVisible = false
 				// this.curFormInfo = {}
+			},
+			switchChange(key, value) {
+				this.curFormInfo.params.forEach(item => {
+					if (item.key === key) {
+						item.value = value
+					}
+				})
 			}
 		}
 	}
