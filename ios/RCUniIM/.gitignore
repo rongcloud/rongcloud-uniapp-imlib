@@ -1,0 +1,8 @@
+bin
+bin_tmp
+build
+framework
+DerivedData
+RCUniIM.xcodeproj/xcuserdata
+RCUniIM.xcodeproj/project.xcworkspace/xcuserdata
+RCUniIM/InternalHeaders
