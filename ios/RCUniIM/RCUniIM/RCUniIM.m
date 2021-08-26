@@ -50,7 +50,7 @@ UNI_EXPORT_METHOD_SYNC(@selector(init:));
 
 UNI_EXPORT_METHOD(@selector(connect:callback:));//done
 - (void)connect:(NSString *)token callback:(UniModuleKeepAliveCallback)callback {
-    [self asyncProcessInMainThread:^{    
+    [self asyncProcessInMainThread:^{
         [[RCCoreClient sharedCoreClient] connectWithToken:token dbOpened:^(RCDBErrorCode code) {
         } success:^(NSString *userId) {
             NSMutableDictionary *dic = [NSMutableDictionary dictionary];
@@ -914,7 +914,7 @@ UNI_EXPORT_METHOD(@selector(setPushContentShowStatus:callback:));//done
             }
         } error:^(RCErrorCode status) {
             if(callback) {
-                callback(@{@"code":@(0)},NO);
+                callback(@{@"code":@(status)},NO);
             }
         }];
 }
@@ -958,7 +958,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       [self sendEventWithName:@"rcimlib-typing-status"
                          body:@{
                            @"conversationType" : @(conversationType),
-                           @"targetId" : targetId,
+                           @"targetId" : targetId ? targetId : @"",
                            @"userId" : item.userId ? item.userId : @"",
                            @"typingContentType" : item.contentType ? item.contentType : @"",
                          }];
@@ -966,7 +966,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       [self sendEventWithName:@"rcimlib-typing-status"
                          body:@{
                            @"conversationType" : @(conversationType),
-                           @"targetId" : targetId,
+                           @"targetId" : targetId ? targetId : @"",
                          }];
     }
 }
@@ -1096,8 +1096,11 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
 }
 
 - (NSDictionary *)fromChatRoomInfo:(RCChatRoomInfo *)chatRoomInfo {
+  if(!chatRoomInfo) {
+    return [NSDictionary new];
+  }
   return @{
-    @"targetId" : chatRoomInfo.targetId,
+    @"targetId" : chatRoomInfo.targetId ? chatRoomInfo.targetId :@"",
     @"memberOrder" : @(chatRoomInfo.memberOrder),
     @"totalMemberCount" : @(chatRoomInfo.totalMemberCount),
     @"members" : [self fromMemberInfoArray:chatRoomInfo.memberInfoArray],
@@ -1105,6 +1108,9 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
 }
 
 - (NSArray *)fromMemberInfoArray:(NSArray<RCChatRoomMemberInfo *> *)list {
+  if(list.count <= 0) {
+    return [NSArray new];
+  }
   NSMutableArray *array = [NSMutableArray arrayWithCapacity:list.count];
   for (int i = 0; i < list.count; i += 1) {
     array[i] = @{
@@ -1116,14 +1122,17 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
 }
 
 - (NSDictionary *)fromMessage:(RCMessage *)message {
+  if(!message) {
+    return [NSDictionary new];
+  }
   return @{
     @"conversationType" : @(message.conversationType),
-    @"objectName" : message.objectName,
-    @"targetId" : message.targetId,
+    @"objectName" : message.objectName ? message.objectName : @"",
+    @"targetId" : message.targetId ? message.targetId : @"",
     @"messageUId" : message.messageUId ? message.messageUId : @"",
     @"messageId" : @(message.messageId),
     @"messageDirection" : @(message.messageDirection),
-    @"senderUserId" : message.senderUserId,
+    @"senderUserId" : message.senderUserId ? message.senderUserId : @"",
     @"sentTime" : @(message.sentTime),
     @"sentStatus" : @(message.sentStatus),
     @"receivedStatus" : @(message.receivedStatus),
@@ -1134,6 +1143,9 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
 }
 
 - (NSDictionary *)fromConversation:(RCConversation *)conversation {
+  if(!conversation) {
+    return [NSDictionary new];
+  }
   return @{
     @"conversationType" : @(conversation.conversationType),
     @"conversationTitle" : conversation.conversationTitle ? conversation.conversationTitle : @"",
@@ -1167,7 +1179,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     RCTextMessage *text = (RCTextMessage *)content;
     return @{
       @"objectName" : @"RC:TxtMsg",
-      @"content" : text.content,
+      @"content" : text.content ? text.content : @"",
       @"extra" : text.extra ? text.extra : @""
     };
   } else if ([content isKindOfClass:[RCFileMessage class]]) {
@@ -1176,8 +1188,8 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"objectName" : @"RC:FileMsg",
       @"local" : file.localPath ? file.localPath : @"",
       @"remote" : file.remoteUrl ? file.remoteUrl : @"",
-      @"name" : file.name,
-      @"fileType" : file.type,
+      @"name" : file.name ? file.name : @"",
+      @"fileType" : file.type ? file.type : @"",
       @"size" : @(file.size),
       @"extra" : file.extra ? file.extra : @"",
     };
@@ -1189,7 +1201,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     }
     return @{
       @"objectName" : @"RC:VcMsg",
-      @"data" : data,
+      @"data" : data ? data : @"",
       @"duration" : @(message.duration),
       @"extra" : message.extra ? message.extra : @"",
     };
@@ -1197,7 +1209,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     RCRecallNotificationMessage *message = (RCRecallNotificationMessage *)content;
     return @{
       @"objectName" : @"RC:RcNtf",
-      @"operatorId" : message.operatorId,
+      @"operatorId" : message.operatorId ? message.operatorId : @"",
       @"recallTime" : @(message.recallTime),
       @"originalObjectName" : message.originalObjectName ? message.originalObjectName : @"",
       @"isAdmin" : @(message.isAdmin),
@@ -1206,46 +1218,50 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     RCContactNotificationMessage *message = (RCContactNotificationMessage *)content;
     return @{
       @"objectName" : @"RC:ContactNtf",
-      @"sourceUserId" : message.sourceUserId,
-      @"targetUserId" : message.targetUserId,
-      @"message" : message.message,
-      @"operation" : message.operation,
+      @"sourceUserId" : message.sourceUserId ? message.sourceUserId : @"",
+      @"targetUserId" : message.targetUserId ? message.targetUserId : @"",
+      @"message" : message.message ?  message.message : @"",
+      @"operation" : message.operation ? message.operation : @"",
       @"extra" : message.extra ? message.extra : @""
     };
   } else if ([content isKindOfClass:[RCCommandNotificationMessage class]]) {
     RCCommandNotificationMessage *message = (RCCommandNotificationMessage *)content;
-    return @{@"objectName" : @"RC:CmdNtf", @"name" : message.name, @"data" : message.data};
+    return @{
+        @"objectName" : @"RC:CmdNtf",
+        @"name" : message.name ? message.name : @"",
+        @"data" : message.data ? message.data : @""
+    };
   } else if ([content isKindOfClass:[RCProfileNotificationMessage class]]) {
     RCProfileNotificationMessage *message = (RCProfileNotificationMessage *)content;
     return @{
       @"objectName" : @"RC:ProfileNtf",
-      @"operation" : message.operation,
-      @"data" : message.data,
+      @"operation" : message.operation ? message.operation : @"",
+      @"data" : message.data ? message.data : @"",
       @"extra" : message.extra ? message.extra : @""
     };
   } else if ([content isKindOfClass:[RCInformationNotificationMessage class]]) {
     RCInformationNotificationMessage *message = (RCInformationNotificationMessage *)content;
     return @{
       @"objectName" : @"RC:InfoNtf",
-      @"message" : message.message,
+      @"message" : message.message ? message.message : @"",
       @"extra" : message.extra ? message.extra : @""
     };
   } else if ([content isKindOfClass:[RCGroupNotificationMessage class]]) {
     RCGroupNotificationMessage *message = (RCGroupNotificationMessage *)content;
     return @{
       @"objectName" : @"RC:GrpNtf",
-      @"operation" : message.operation,
-      @"operatorUserId" : message.operatorUserId,
-      @"message" : message.message,
-      @"data" : message.data,
+      @"operation" : message.operation ?  message.operation : @"",
+      @"operatorUserId" : message.operatorUserId ? message.operatorUserId : @"",
+      @"message" : message.message ? message.message : @"",
+      @"data" : message.data ? message.data : @"",
       @"extra" : message.extra ? message.extra : @""
     };
   } else if ([content isKindOfClass:[RCHQVoiceMessage class]]) {
     RCHQVoiceMessage *message = (RCHQVoiceMessage *)content;
     return @{
       @"objectName" : @"RC:HQVCMsg",
-      @"local" : message.localPath,
-      @"remote" : message.remoteUrl,
+      @"local" : message.localPath ? message.localPath : @"",
+      @"remote" : message.remoteUrl ? message.remoteUrl : @"",
       @"duration" : @(message.duration),
       @"extra" : message.extra ? message.extra : @"",
     };
@@ -1253,8 +1269,8 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     RCGIFMessage *message = (RCGIFMessage *)content;
     return @{
       @"objectName" : @"RC:GIFMsg",
-      @"local" : message.localPath,
-      @"remote" : message.remoteUrl,
+      @"local" : message.localPath ? message.localPath : @"",
+      @"remote" : message.remoteUrl ? message.remoteUrl : @"",
       @"width" : @(message.width),
       @"height" : @(message.height),
       @"gifDataSize" : @(message.gifDataSize),
