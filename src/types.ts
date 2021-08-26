@@ -1116,9 +1116,9 @@ export interface PushConfig {
     MI_PUSH_APPID: string,
     MI_PUSH_APPKEY: string
   },
-  MIZU: {
-    MIZU_PUSH_APPID: string,
-    MIZU_PUSH_APPKEY: string
+  MEIZU: {
+    MEIZU_PUSH_APPID: string,
+    MEIZU_PUSH_APPKEY: string
   },
   OPPO: {
     OPPO_PUSH_APPID: string,

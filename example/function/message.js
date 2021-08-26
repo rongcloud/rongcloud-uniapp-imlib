@@ -15,6 +15,7 @@ import {
 	addReceiptResponseListener,
 	cancelSendMediaMessage,
 	cancelDownloadMediaMessage,
+	downloadMediaMessage,
 	getHistoryMessages,
 	getHistoryMessagesByTimestamp,
 	insertOutgoingMessage,
@@ -95,6 +96,13 @@ export const _sendMessage = {
 			msg,
 			(res) => {
 				console.log(JSON.stringify(res))
+				if (res.code === 0) {
+					_global.lastSendMsg = {
+						messageId: res.messageId,
+						conversationType: conversationType,
+						targetId: targetId
+					}
+				}
 				addPrimaryResult({
 					title: 'sendMessage',
 					code: res.code,
@@ -209,7 +217,7 @@ export const _recallMessage = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'recallMessage',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -233,8 +241,7 @@ export const _sendTypingStatus = {
 		)
 		addPrimaryResult({
 			title: 'sendTypingStatus',
-			code: res,
-			data: res
+			data: '没有返回值'
 		})
 	}
 }
@@ -254,7 +261,7 @@ export const _setMessageSentStatus = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'setMessageSentStatus',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -278,7 +285,7 @@ export const _setMessageReceivedStatus = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'setMessageReceivedStatus',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -304,8 +311,7 @@ export const _sendReadReceiptMessage = {
 		console.log(JSON.stringify(res))
 		addPrimaryResult({
 			title: 'sendReadReceiptMessage',
-			code: res,
-			data: res
+			data: '没有返回值'
 		})
 	}
 }
@@ -323,7 +329,7 @@ export const _sendReadReceiptRequest = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'sendReadReceiptRequest',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -334,22 +340,27 @@ export const _sendReadReceiptRequest = {
 
 export const _sendReadReceiptResponse = {
 	name: "发起群组消息回执响应",
+	before: function() {
+		console.log(JSON.stringify(_global))
+		this.params[2].value = JSON.stringify(_global.lastSendMsg)
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
 		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
-		{ key: 'messages', value: _global.lastReceivedMsg, type: 'string', name: '消息，多个以,隔开'},
+		{ key: 'messages', value: config.conversationType, type: 'textarea', name: '会话类型(消息)'},
 	],
 	action: function({conversationType, targetId, messages}) {
 		console.log('调用sendReadReceiptResponse方法')
+		const msgs = JSON.parse(messages.replace('\n', '').replace('\t', ''))
 		sendReadReceiptResponse(
 			conversationType,
 			targetId,
-			messages.split(','),
+		 	msgs,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'sendReadReceiptResponse',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -367,13 +378,15 @@ export const _addReadReceiptReceivedListener = {
 				console.log('received ReadReceiptReceivedListener')
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
-					title: 'addReadReceiptReceivedListener',
+					title: '收到私聊阅读回',
 					code: res,
 					data: res
 				})
 			}
 		)
-		
+		addPrimaryResult({
+			title: '添加私聊阅读回执监听函数'
+		})
 	}
 }
 
@@ -386,13 +399,14 @@ export const _addReceiptRequestListener = {
 				console.log('received addReceiptRequestListener')
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
-					title: 'addReceiptRequestListener',
-					code: res,
+					title: '收到消息已读回执请求',
 					data: res
 				})
 			}
 		)
-		
+		addPrimaryResult({
+			title: '添加收到消息已读回执请求监听函数'
+		})
 	}
 }
 
@@ -405,13 +419,14 @@ export const _addReceiptResponseListener = {
 				console.log('received addReceiptResponseListener')
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
-					title: 'addReceiptResponseListener',
-					code: res,
+					title: '收到消息回执响应',
 					data: res
 				})
 			}
 		)
-		
+		addPrimaryResult({
+			title: '添加消息回执响应监听函数'
+		})
 	}
 }
 
@@ -428,7 +443,7 @@ export const _cancelSendMediaMessage = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'cancelSendMediaMessage',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -450,7 +465,7 @@ export const _cancelDownloadMediaMessage = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'cancelDownloadMediaMessage',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -519,7 +534,7 @@ export const _getHistoryMessages = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getHistoryMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -547,7 +562,7 @@ export const _getHistoryMessagesByTimestamp = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getHistoryMessagesByTimestamp',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -602,7 +617,6 @@ export const _insertIncomingMessage = {
 		{ key: 'sentTime', value: Date.now(), type: 'number', name: '发送时间'},
 	],
 	action: function({conversationType, targetId, status, objectName, content, extra, sentTime}) {
-		console.log(111)
 		console.log('调用insertIncomingMessage方法', JSON.stringify(arguments))
 		insertIncomingMessage(
 			conversationType,
@@ -618,7 +632,7 @@ export const _insertIncomingMessage = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'insertIncomingMessage',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -641,7 +655,7 @@ export const _clearMessages = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'clearMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -664,7 +678,7 @@ export const _deleteMessages = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'deleteMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -680,12 +694,12 @@ export const _deleteMessagesByIds = {
 	action: function({messageId}) {
 		console.log('调用deleteMessagesByIds方法')
 		deleteMessagesByIds(
-			messageId.split(','),
+			messageId.split(',').map(i => parseInt(i)),
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'deleteMessagesByIds',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -715,7 +729,7 @@ export const _searchMessages = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'searchMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -736,7 +750,7 @@ export const _getMessage = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getMessage',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -757,7 +771,7 @@ export const _getMessageByUId = {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getMessageByUId',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -767,16 +781,20 @@ export const _getMessageByUId = {
 
 export const _setMessageExtra = {
 	name: "设置消息的附加信息",
-	action: function() {
+	params: [
+		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息Id'},
+		{ key: 'extra', value: 'extra info', type: 'string', name: 'extra'},
+	],
+	action: function({messageId, extra}) {
 		console.log('调用setMessageExtra方法')
 		setMessageExtra(
-			_global.lastSendMsg,
-			'extra info',
+			messageId,
+			extra,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'setMessageExtra',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -786,15 +804,18 @@ export const _setMessageExtra = {
 
 export const _getMessageSendTime = {
 	name: "获取消息发送时间",
-	action: function() {
+	params: [
+		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息Id'},
+	],
+	action: function({messageId}) {
 		console.log('调用getMessageSendTime方法')
 		getMessageSendTime(
-			_global.lastSendMsg,
+			messageId,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getMessageSendTime',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -804,16 +825,20 @@ export const _getMessageSendTime = {
 
 export const _getMessageCount = {
 	name: "获取会话中的消息数量",
-	action: function() {
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+	],
+	action: function({conversationType, targetId}) {
 		console.log('调用getMessageCount方法')
 		getMessageCount(
-			config.conversationType,
-			config.targetId,
+			conversationType,
+			targetId,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getMessageCount',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -823,16 +848,20 @@ export const _getMessageCount = {
 
 export const _getFirstUnreadMessage = {
 	name: "获取会话里第一条未读消息",
-	action: function() {
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+	],
+	action: function({conversationType, targetId}) {
 		console.log('调用getFirstUnreadMessage方法')
 		getFirstUnreadMessage(
-			config.conversationType,
-			config.targetId,
+			conversationType,
+			targetId,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getFirstUnreadMessage',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -842,16 +871,20 @@ export const _getFirstUnreadMessage = {
 
 export const _getUnreadMentionedMessages = {
 	name: "获取会话中 @ 提醒自己的消息",
-	action: function() {
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+	],
+	action: function({conversationType, targetId}) {
 		console.log('调用getUnreadMentionedMessages方法')
 		getUnreadMentionedMessages(
-			config.conversationType,
-			config.targetId,
+			conversationType,
+			targetId,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getUnreadMentionedMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -861,18 +894,24 @@ export const _getUnreadMentionedMessages = {
 
 export const _getRemoteHistoryMessages = {
 	name: "获取服务端历史消息",
-	action: function() {
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'sentTime', value: Date.now(), type: 'number', name: 'sentTime'},
+		{ key: 'count', value: 10, type: 'number', name: 'count'},
+	],
+	action: function({conversationType, targetId, sentTime, count}) {
 		console.log('调用getRemoteHistoryMessages方法')
 		getRemoteHistoryMessages(
-			config.conversationType,
-			config.targetId,
-			0,
-			10,
+			conversationType,
+			targetId,
+			sentTime,
+			count,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'getRemoteHistoryMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -882,17 +921,22 @@ export const _getRemoteHistoryMessages = {
 
 export const _cleanRemoteHistoryMessages = {
 	name: "清除服务端历史消息",
-	action: function() {
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'recordTime', value: Date.now(), type: 'number', name: '截止时间'},
+	],
+	action: function({conversationType, targetId, recordTime}) {
 		console.log('调用cleanRemoteHistoryMessages方法')
 		cleanRemoteHistoryMessages(
-			config.conversationType,
-			config.targetId,
-			0,
+			conversationType,
+			targetId,
+			recordTime,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'cleanRemoteHistoryMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}
@@ -902,18 +946,24 @@ export const _cleanRemoteHistoryMessages = {
 
 export const _cleanHistoryMessages = {
 	name: "清除历史消息",
-	action: function() {
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'recordTime', value: Date.now(), type: 'number', name: '截止时间'},
+		{ key: 'clearRemote', value: false, type: 'boolean', name: '是否同时删除服务端消息'},
+	],
+	action: function({conversationType, targetId, recordTime, clearRemote}) {
 		console.log('调用cleanHistoryMessages方法')
 		cleanHistoryMessages(
 			config.conversationType,
 			config.targetId,
-			0,
-			true,
+			recordTime,
+			clearRemote,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
 					title: 'cleanHistoryMessages',
-					code: res,
+					code: res.code,
 					data: res
 				})
 			}

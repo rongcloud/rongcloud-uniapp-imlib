@@ -24,7 +24,7 @@ try{
 export const _joinChatRoom = {
 	name: "加入聊天室",
 	params: [
-		{ key: 'targetId', value: config.targetId, type: 'number', name: '用户ID'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '用户ID'},
 		{ key: 'messageCount', value: 10, type: 'number', name: '获取的消息数量'},
 	],
 	action: function({targetId, messageCount}) {
@@ -34,9 +34,10 @@ export const _joinChatRoom = {
 			messageCount,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用joinChatRoom成功',
-					data: res
+				addPrimaryResult({
+					title: '调用joinChatRoom',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -44,9 +45,9 @@ export const _joinChatRoom = {
 }
 
 export const _joinExistChatRoom = {
-	name: "加入聊天室",
+	name: "加入已存在聊天室",
 	params: [
-		{ key: 'targetId', value: config.targetId, type: 'number', name: '用户ID'},
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '用户ID'},
 		{ key: 'messageCount', value: 10, type: 'number', name: '获取的消息数量'},
 	],
 	action: function({targetId, messageCount}) {
@@ -56,9 +57,10 @@ export const _joinExistChatRoom = {
 			messageCount,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用joinExistChatRoom成功',
-					data: res
+				addPrimaryResult({
+					title: '调用joinExistChatRoom',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -66,9 +68,9 @@ export const _joinExistChatRoom = {
 }
 
 export const _quitChatRoom = {
-	name: "加入聊天室",
+	name: "退出聊天室",
 	params: [
-		{ key: 'targetId', value: config.targetId, type: 'number', name: '用户ID'}
+		{ key: 'targetId', value: config.targetId, type: 'string', name: '用户ID'}
 	],
 	action: function({targetId}) {
 		console.log('调用quitChatRoom方法')
@@ -76,9 +78,10 @@ export const _quitChatRoom = {
 			targetId,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
+				addPrimaryResult({
 					title: '调用quitChatRoom成功',
-					data: res
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -89,7 +92,7 @@ export const _getRemoteChatRoomHistoryMessages = {
 	name: "从服务器端获取聊天室的历史消息",
 	params: [
 		{ key: 'targetId', value: config.targetId, type: 'string', name: '用户ID'},
-		{ key: 'recordTime', value: 0, type: 'number', name: '起始的消息发送时间戳'},
+		{ key: 'recordTime', value: Date.now(), type: 'number', name: '起始的消息发送时间戳'},
 		{ key: 'count', value: 10, type: 'number', name: '要获取的消息数量'},
 		{ key: 'order', value: 0, type: 'number', name: '拉取顺序'},
 	],
@@ -102,9 +105,10 @@ export const _getRemoteChatRoomHistoryMessages = {
 			order,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用getRemoteChatRoomHistoryMessages成功',
-					data: res
+				addPrimaryResult({
+					title: '调用getRemoteChatRoomHistoryMessages',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -126,9 +130,10 @@ export const _getChatRoomInfo = {
 			order,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
+				addPrimaryResult({
 					title: '调用getChatRoomInfo成功',
-					data: res
+					data: res,
+					code: res.code
 				})
 			}
 		)

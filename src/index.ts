@@ -438,7 +438,9 @@ export interface MediaMessageCallback {
  */
 export function downloadMediaMessage (messageId: number, callback: MediaMessageCallback = {}) {
   const eventId = Math.random().toString()
-  const listener = eventEmitter.addEventListener('rcimlib-download-media-message', (data: any) => {
+  const listener = RCIMClient.addEventListener('rcimlib-download-media-message', (data: any) => {
+    console.log(data)
+    data = data.data
     if (callback) {
       if (data.eventId === eventId) {
         const { success, error, progress, cancel } = callback
@@ -810,7 +812,7 @@ export function cleanRemoteHistoryMessages (
 }
 
 /**
- * 清除服务端历史消息 //down
+ * 清除历史消息 //down
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID

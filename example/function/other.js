@@ -6,7 +6,7 @@ import {
 	getOfflineMessageDuration,
 	setOfflineMessageDuration,
 	getCurrentUserId,
-	setPushLanguage,
+	setPushLanguageCode,
 	setPushContentShowStatus,
 	getPushContentShowStatus,
 	setReconnectKickEnable,
@@ -39,9 +39,10 @@ export const _setNotificationQuietHours = {
 			spanMinutes,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用setNotificationQuietHours成功',
-					data: res
+				addPrimaryResult({
+					title: '调用setNotificationQuietHours',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -55,9 +56,10 @@ export const _getNotificationQuietHours = {
 		getNotificationQuietHours(
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用getNotificationQuietHours成功',
-					data: res
+				addPrimaryResult({
+					title: '调用getNotificationQuietHours',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -71,9 +73,10 @@ export const _removeNotificationQuietHours = {
 		removeNotificationQuietHours(
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用removeNotificationQuietHours成功',
-					data: res
+				addPrimaryResult({
+					title: '调用removeNotificationQuietHours',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -87,9 +90,10 @@ export const _getOfflineMessageDuration = {
 		getOfflineMessageDuration(
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用getOfflineMessageDuration成功',
-					data: res
+				addPrimaryResult({
+					title: '调用getOfflineMessageDuration',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -98,14 +102,19 @@ export const _getOfflineMessageDuration = {
 
 export const _setOfflineMessageDuration = {
 	name: "设置离线消息在服务端的存储时间",
-	action: function() {
+	params: [	
+		{ key: 'duration', value: 7, type: 'number', name: '存储时间'},
+	],
+	action: function({duration}) {
 		console.log('调用setOfflineMessageDuration方法')
 		setOfflineMessageDuration(
+			duration,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用setOfflineMessageDuration成功',
-					data: res
+				addPrimaryResult({
+					title: '调用setOfflineMessageDuration',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -119,29 +128,31 @@ export const _getCurrentUserId = {
 		getCurrentUserId(
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用getCurrentUserId成功',
-					data: res
+				addPrimaryResult({
+					title: '调用getCurrentUserId',
+					data: res,
+					code: res.code
 				})
 			}
 		)
 	}
 }
 
-export const _setPushLanguage = {
+export const _setPushLanguageCode = {
 	name: "设置推送语言",
 	params: [
-		{ key: 'language', value: 1, type: 'number', name: '推送语言'},
+		{ key: 'language', value: 'en_US', type: 'string', name: '推送语言'},
 	],
 	action: function({language}) {
-		console.log('调用setPushLanguage方法')
-		setPushLanguage(
+		console.log('调用setPushLanguageCode方法')
+		setPushLanguageCode(
 			language,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用setPushLanguage成功',
-					data: res
+				addPrimaryResult({
+					title: '调用setPushLanguageCode',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -159,9 +170,10 @@ export const _setPushContentShowStatus = {
 			isShowPushContent,
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用setPushContentShowStatus成功',
-					data: res
+				addPrimaryResult({
+					title: '调用setPushContentShowStatus',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -175,9 +187,10 @@ export const _getPushContentShowStatus = {
 		getPushContentShowStatus(
 			 (res) => {
 				console.log(JSON.stringify(res))
-				addSuccessResult({
-					title: '调用getPushContentShowStatus成功',
-					data: res
+				addPrimaryResult({
+					title: '调用getPushContentShowStatus',
+					data: res,
+					code: res.code
 				})
 			}
 		)
@@ -191,14 +204,11 @@ export const _setReconnectKickEnable = {
 	],
 	action: function({enabled}) {
 		console.log('调用setReconnectKickEnable方法')
-		const res = setReconnectKickEnable(
+		setReconnectKickEnable(
 			enabled
 		)
-		console.log(JSON.stringify(res))
 		addPrimaryResult({
-			title: 'setReconnectKickEnable',
-			code: res,
-			data: res
+			title: 'setReconnectKickEnable成功'
 		})
 	}
 }

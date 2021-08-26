@@ -127,6 +127,8 @@
 			},
 			showForm(info) {
 				this.curFormInfo = info
+				this.curFormInfo.before && this.curFormInfo.before()
+				
 				this.curFormVisible = true
 				this.$refs.formPopup.open()
 			},
