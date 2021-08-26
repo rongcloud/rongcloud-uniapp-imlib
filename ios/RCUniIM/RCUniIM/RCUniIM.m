@@ -813,6 +813,9 @@ UNI_EXPORT_METHOD(@selector(getBlacklistStatus: callback:));
 UNI_EXPORT_METHOD(@selector(getBlacklist:));
 - (void)getBlacklist:(UniModuleKeepAliveCallback)callback {//done
     [RCCoreClient.sharedCoreClient getBlacklist:^(NSArray *blockUserIds) {
+        if(!blockUserIds) {
+            blockUserIds = [NSArray new];
+        }
         if(callback) {
             callback(@{@"code":@(0),@"list":blockUserIds},NO);
         }
