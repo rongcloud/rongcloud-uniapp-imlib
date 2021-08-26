@@ -31,6 +31,12 @@ UNI_EXPORT_METHOD_SYNC(@selector(setStatisticServer:));
     [RCCoreClient.sharedCoreClient setStatisticServer:server];
 }
 
+//设置安卓的推送配置，iOS 空实现
+UNI_EXPORT_METHOD_SYNC(@selector(setPushConfig:));
+- (void)setPushConfig:(NSDictionary *)dic {
+    
+}
+
 UNI_EXPORT_METHOD_SYNC(@selector(init:));
 - (void)init:(NSString *)key {//done
     [self asyncProcessInMainThread:^{
