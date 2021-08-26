@@ -12,11 +12,11 @@
   "scripts": {
     "build": "rollup -c scripts/rollup.prod.js",
     "build:dev": "rollup -c scripts/rollup.dev.js",
-    "release": "node scripts/release.prod"
+    "release": "node scripts/release.prod",
+    "release:dev": "node scripts/release.dev"
   },
   "repository": {
-    "type": "git",
-    "url": "git@gitlab2.rongcloud.net:websdk-team/multiple-platforms/rongcloud-uniapp-imlib.git"
+    "type": "git"
   },
   "author": "",
   "files": [

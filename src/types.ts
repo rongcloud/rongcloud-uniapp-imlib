@@ -593,11 +593,45 @@ export enum ConnectionStatusAndroid {
  */
 export type ConnectionStatus = ConnectionStatusIOS | ConnectionStatusAndroid;
 
+export interface ConnectionListenerResult {
+  status: ConnectionStatus
+}
 
+export enum ResponseType {
+  SUCCESS = 'success',
+  ERROR = 'error'
+}
+/**
+ * 连接回调 
+ */
 export interface ConnectResult {
-  error: ConnectErrorCode,
+  code: ConnectErrorCode,
   userId?: number
 }
+
+/**
+ * 监听日志回调参数
+ */
+export interface LogInfoResult {
+  logInfo: string
+}
+/**
+ * 监听撤回消息回调参数
+ */
+export interface RecallMessageResult {
+  messageId: number
+}
+
+
+/**
+ * uni监听
+ */
+export interface UniListenerResult<T> {
+  type: string,
+  module: string,
+  data: T
+}
+
 /**
  * 要发送的消息
  */
@@ -626,6 +660,58 @@ export interface SentMessage {
    * 推送数据，不显示
    */
   pushData: string;
+}
+
+export interface SendMessageResult extends BaseResult {
+  messageId?: number
+}
+
+export interface SendRecallMessageResult extends BaseResult {
+  message?: RecallNotificationMessage
+}
+
+export interface BaseResult {
+  code: number
+}
+
+export interface MessageListResult extends BaseResult {
+  messages?: Message[]
+}
+
+export interface MessageResult extends BaseResult {
+  message?: Message
+}
+
+export interface ConversationResult extends BaseResult {
+  conversation?: Conversation
+}
+
+export interface ConversationListResult extends BaseResult {
+  conversations?: Conversation[]
+}
+
+export interface statusResult extends BaseResult {
+  status?: number
+}
+
+export interface DraftResult extends BaseResult {
+  draft?: string
+}
+export interface CountResult extends BaseResult {
+  count?: number
+}
+export interface ChatRoomInfoResult extends BaseResult {
+  chatRoomInfo?: ChatRoomInfo
+}
+
+/**
+ * 搜索会话结果
+ */
+ export interface SearchConversationResult extends BaseResult {
+  result?: {
+    conversation: Conversation;
+    matchCount: number;
+  }
 }
 
 /**
@@ -773,7 +859,6 @@ export interface TypingStatus {
   conversationType: ConversationType;
   targetId: string;
   userId: string;
-  sentTime: number;
   typingContentType: string;
 }
 
@@ -794,14 +879,6 @@ export interface ReceiptResponse {
   targetId: string;
   messageUId: string;
   users: { [key: string]: number };
-}
-
-/**
- * 搜索会话结果
- */
-export interface SearchConversationResult {
-  conversation: Conversation;
-  matchCount: number;
 }
 
 /**
@@ -1006,8 +1083,9 @@ export interface CSGroupItem {
  * 推送语言
  */
 export enum PushLanguage {
-  EN_US = 1,
-  ZH_CN
+  EN_US = 'en_US',
+  ZH_CN = 'zh_CN',
+  AR_SA = 'ar_SA'
 }
 
 /**
@@ -1030,13 +1108,20 @@ export interface PushNotificationMessage {
   extra: string;
 }
 
-/**
- * uni监听
- */
-export interface IUniListener {
-  type: string,
-  module: string,
-  data: {
-    status: number
+export interface PushConfig {
+  FCM: boolean,
+  HW: boolean,
+  VIVO: boolean,
+  MI: {
+    MI_PUSH_APPID: string,
+    MI_PUSH_APPKEY: string
+  },
+  MIZU: {
+    MIZU_PUSH_APPID: string,
+    MIZU_PUSH_APPKEY: string
+  },
+  OPPO: {
+    OPPO_PUSH_APPID: string,
+    OPPO_PUSH_APPKEY: string
   }
 }
