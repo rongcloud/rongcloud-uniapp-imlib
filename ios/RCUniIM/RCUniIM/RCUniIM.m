@@ -385,9 +385,6 @@ UNI_EXPORT_METHOD(@selector(getRemoteHistoryMessages: targetId: time: count: cal
           array[i] = [self fromMessage:messages[i]];
         }
         if(callback) {
-            callback(array,NO);
-        }
-        if(callback) {
             callback(@{@"code":@(0),@"messages":array},NO);
         }
     } error:^(RCErrorCode status) {
