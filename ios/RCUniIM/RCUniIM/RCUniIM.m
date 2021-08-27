@@ -385,9 +385,6 @@ UNI_EXPORT_METHOD(@selector(getRemoteHistoryMessages: targetId: time: count: cal
           array[i] = [self fromMessage:messages[i]];
         }
         if(callback) {
-            callback(array,NO);
-        }
-        if(callback) {
             callback(@{@"code":@(0),@"messages":array},NO);
         }
     } error:^(RCErrorCode status) {
@@ -476,14 +473,12 @@ UNI_EXPORT_METHOD(@selector(getMessage: callback:));
 UNI_EXPORT_METHOD(@selector(getMessageByUId: callback:));//done
 - (void)getMessageByUId:(NSString *)UId callback:(UniModuleKeepAliveCallback)callback {
     RCMessage *message = [RCCoreClient.sharedCoreClient getMessageByUId:UId];
+    NSDictionary *dic = [NSDictionary new];
     if(message) {
-        if(callback) {
-            callback(@{@"code":@(0),@"message":[self fromMessage:message]},NO);
-        }
-    }else {
-        if(callback) {
-            callback(@{@"code":@(-1)},NO);
-        }
+        dic = [self fromMessage:message];
+    }
+    if(callback) {
+        callback(@{@"code":@(0),@"message":dic},NO);
     }
 }
 
