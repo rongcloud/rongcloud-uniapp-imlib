@@ -53,7 +53,6 @@ public class RCUniIM extends UniModule {
 
     @UniJSMethod()
     public void init(String appKey) {
-        Log.e(TAG, "init : " + appKey);
         if (isValidContext()) {
             RongCoreClient.init(mUniSDKInstance.getContext(), appKey);
         }
@@ -1265,7 +1264,6 @@ public class RCUniIM extends UniModule {
 
             @Override
             public void onSuccess(Message message) {
-                Log.i(TAG, "onSuccess");
                 JSONObject data = new JSONObject();
                 data.put("code", 0);
                 data.put("messageId", message.getMessageId());
@@ -1276,7 +1274,6 @@ public class RCUniIM extends UniModule {
 
             @Override
             public void onError(Message message, IRongCoreEnum.CoreErrorCode coreErrorCode) {
-                Log.i(TAG, "onError");
                 JSONObject data = new JSONObject();
                 data.put("code", coreErrorCode.getValue());
                 data.put("messageId", message.getMessageId());
