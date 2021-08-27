@@ -677,7 +677,7 @@ public class RCUniIM extends UniModule {
             public void onSuccess(String[] strings) {
                 JSONObject data = new JSONObject();
                 data.put("code", 0);
-                if (strings.length <= 0) {
+                if (strings == null || strings.length <= 0) {
                     data.put("list", new String[0]);
                 } else {
                     data.put("list", strings);
