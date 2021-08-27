@@ -25,18 +25,17 @@ import {
 } from "../../dist"
 import {addSuccessResult, addErrorResult, addPrimaryResult} from '../util/common.js'
 import config from '../config/config.js'
-let baseConfig = uni.getStorageSync('testBaseConfig')
-try{
-	if (baseConfig) {
-		config.appkey = baseConfig.appkey
-		config.token = baseConfig.token
-		config.targetId = baseConfig.targetId
-		config.conversationType = baseConfig.conversationType
-	}
-}catch(e){
-	//TODO handle the exception
-}
-
+// let baseConfig = uni.getStorageSync('testBaseConfig')
+// try{
+// 	if (baseConfig) {
+// 		config.appkey = baseConfig.appkey
+// 		config.token = baseConfig.token
+// 		config.targetId = baseConfig.targetId
+// 		config.conversationType = baseConfig.conversationType
+// 	}
+// }catch(e){
+// 	//TODO handle the exception
+// }
 export const _GetConversationList = {
 	name: "获取会话列表",
 	params: [
@@ -48,6 +47,14 @@ export const _GetConversationList = {
 		console.log('调用获取会话列表方法')
 		conversationTypes = conversationTypes.split(',').map(i => parseInt(i))
 		getConversationList(conversationTypes, count, timestamp, (res) => {
+			if (res.code === 0 && res.conversations.length > 0) {
+				config.targetIdList = res.conversations.map(i => {
+					return {
+						label: i.targetId,
+						value: i.targetId,
+					}
+				})
+			} 
 			addPrimaryResult({
 				title: '获取会话列表 ',
 				data: res,
@@ -59,9 +66,13 @@ export const _GetConversationList = {
 
 export const _SyncConversationReadStatus = {
 	name: "同步会话阅读状态",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '数量'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'timestamp', value: Date.now(), type: 'number'},
 	],
 	action: function({conversationType, targetId, timestamp}) {
@@ -80,6 +91,7 @@ export const _getBlockedConversationList = {
 	name: "获取屏蔽消息提醒的会话列表",
 	params: [
 		{ key: 'conversationTypes', value: '1,3', type: 'string', name: '会话类型(多个以英文","隔开)'},
+		
 	],
 	action: function({conversationTypes}) {
 		console.log('调用getBlockedConversationList方法')
@@ -124,9 +136,13 @@ export const _searchConversations = {
 
 export const _getConversation = {
 	name: "获取会话",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话Id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getConversation方法')
@@ -147,9 +163,13 @@ export const _getConversation = {
 
 export const _removeConversation = {
 	name: "删除会话",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话Id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用removeConversation方法')
@@ -170,9 +190,13 @@ export const _removeConversation = {
 
 export const _setConversationNotificationStatus = {
 	name: "设置会话免打扰状态",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话Id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'isBlock', value: true, type: 'boolean', name: '是否屏蔽'},
 	],
 	action: function({conversationType, targetId, isBlock}) {
@@ -195,9 +219,13 @@ export const _setConversationNotificationStatus = {
 
 export const _getConversationNotificationStatus = {
 	name: "获取会话免打扰状态",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话Id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getConversationNotificationStatus方法')
@@ -219,9 +247,13 @@ export const _getConversationNotificationStatus = {
 
 export const _setConversationToTop = {
 	name: "设置会话置顶状态",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话Id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'isTop', value: true, type: 'boolean', name: '是否置顶'},
 	],
 	action: function({conversationType, targetId, isTop}) {
@@ -267,9 +299,13 @@ export const _getTopConversationList = {
 
 export const _saveTextMessageDraft = {
 	name: "保存某一会话的文本消息草稿",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'content', value: 'content info', type: 'string', name: '内容'},
 	],
 	action: function({conversationType, targetId, content}) {
@@ -292,9 +328,13 @@ export const _saveTextMessageDraft = {
 
 export const _getTextMessageDraft = {
 	name: "获取某一会话的文本消息草稿",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getTextMessageDraft方法')
@@ -315,9 +355,13 @@ export const _getTextMessageDraft = {
 
 export const _clearTextMessageDraft = {
 	name: "清除某一会话的文本消息草稿",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用clearTextMessageDraft方法')
@@ -355,9 +399,13 @@ export const _getTotalUnreadCount = {
 
 export const _getUnreadCount = {
 	name: "获取指定会话的未读消息数",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getUnreadCount方法')
@@ -378,9 +426,13 @@ export const _getUnreadCount = {
 
 export const _clearMessagesUnreadStatus = {
 	name: "清除某个会话中的未读消息数",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'time', value: Date.now(), type: 'number', name: '时间戳'},
 	],
 	action: function({conversationType, targetId, time}) {

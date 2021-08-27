@@ -78,6 +78,12 @@
 							<view class="" v-else-if="item.type === 'textarea'">
 								<textarea v-model="item.value" :placeholder="'请输入' + item.key" style="border: 1px solid #999999;padding: 3px"/>
 							</view>
+							<view class="" v-else-if="item.type === 'picker'">
+								<!-- 目前一个表单中picker仅支持一个 -->
+								<picker @change="(e) => {bindPickerChange(e, item.key)}" :value="item.valueIndex" :range="item.list" range-key="label">
+									<view class="uni-input" style="background-color: #C0C0C0;">{{item.list[item.valueIndex].label}}</view>
+								</picker>
+							</view>
 							<view class="" v-else>
 								<input  type="text" v-model="item.value" :placeholder="'请输入' + item.key" maxlength="-1" style="border: 1px solid #999999;padding: 3px"/>
 							</view>
@@ -154,6 +160,15 @@
 						item.value = value
 					}
 				})
+			},
+			bindPickerChange(event, key) {
+				console.log(key)
+				this.curFormInfo.params.forEach(item => {
+					if (item.key === key) {
+						item.valueIndex = event.detail.value
+						item.value = item.list[item.valueIndex].value
+					}
+				})
 			}
 		}
 	}
@@ -182,7 +197,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		background-color: rgba(0,0,0,0.1);
+		background-color: #c0c0c0;
 		position: fixed;
 		bottom: 0;
 		left: 0;

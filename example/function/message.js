@@ -10,9 +10,6 @@ import {
 	setMessageReceivedStatus,
 	sendReadReceiptMessage,
 	sendReadReceiptRequest,
-	addReadReceiptReceivedListener,
-	addReceiptRequestListener,
-	addReceiptResponseListener,
 	cancelSendMediaMessage,
 	cancelDownloadMediaMessage,
 	downloadMediaMessage,
@@ -42,9 +39,13 @@ import _global from '../config/global.js'
 
 export const _sendMessage = {
 	name: "发送消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
 		{ key: 'content', value: 'content info', type: 'string', name: '消息内容'},
 		{ key: 'extra', value: 'extra info', type: 'string'},
@@ -112,67 +113,84 @@ export const _sendMessage = {
 		)
 	}
 }
-
+const lastMediaInfoUrl = ''
 export const _sendMediaMessage = {
 	name: "发送媒体消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用sendMediaMessage方法')
-		// uni.chooseImage({
-		// 	count: 1,
-		// 	success: (list) => {
-		// 		consolt.log(list)
-		// 	}
-		// })
-		sendMediaMessage(
-			{
-				conversationType: config.conversationType,
-				targetId: config.targetId,
-				content: {
-					objectName: 'RC:ImgMsg',
-					local: 'local url',
-				}
-			},
-			{
-				success: (messageId) => {
-					addSuccessResult({
-						title: 'sendMediaMessage success',
-						code: messageId,
-						data: messageId
-					})
-				},
-				  progress: (progress, messageId) => {
-					  addPrimaryResult({
-					  	title: 'sendMediaMessage progress ',
-					  	code: progress,
-					  	data: {messageId, progress}
-					  })
-				  },
-				  cancel: (messageId) => {
-					  addPrimaryResult({
-					  	title: 'sendMediaMessage cancel',
-					  	data: messageId
-					  })
-				  },
-				  error: (errorCode, messageId) => {
-					  addErrorResult({
-					  	title: 'sendMediaMessage error',
-					  	data: {messageId, errorCode}
-					  })
-				  }
+		uni.chooseImage({
+			count: 1,
+			success: (res) => {
+				if (res.tempFilePaths.length < 0) return
+				uni.getImageInfo({
+					src:res.tempFilePaths[0],
+					success: (imgInfo) => {
+						console.log(imgInfo)
+						sendMediaMessage(
+							{
+								conversationType: conversationType,
+								targetId: targetId,
+								content: {
+									objectName: 'RC:ImgMsg',
+									local: imgInfo.path,
+								}
+							},
+							{
+								success: (messageId) => {
+									addSuccessResult({
+										title: 'sendMediaMessage success',
+										code: messageId,
+										data: messageId
+									})
+								},
+								  progress: (progress, messageId) => {
+									  addPrimaryResult({
+									  	title: 'sendMediaMessage progress ',
+									  	code: progress,
+									  	data: {messageId, progress}
+									  })
+								  },
+								  cancel: (messageId) => {
+									  addPrimaryResult({
+									  	title: 'sendMediaMessage cancel',
+									  	data: messageId
+									  })
+								  },
+								  error: (errorCode, messageId) => {
+									  addErrorResult({
+									  	title: 'sendMediaMessage error',
+									  	data: {messageId, errorCode}
+									  })
+								  }
+							}
+						)
+					}
+				})
+				return
+				
 			}
-		)
+		})
+		
 	}
 }
 
 export const _sendDirectionalMessage = {
 	name: "发送定向消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
 		{ key: 'content', value: 'content info', type: 'string', name: '消息内容'},
 		{ key: 'userIdList', value: 'user002', type: 'string', name: 'userIds'},
@@ -204,8 +222,11 @@ export const _sendDirectionalMessage = {
 
 export const _recallMessage = {
 	name: "消息撤回",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息ID'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息ID'},
 		{ key: 'pushContent', value: 'recall a message', type: 'string', name: '推送内容'},
 	],
 	action: function({messageId, pushContent}) {
@@ -227,9 +248,13 @@ export const _recallMessage = {
 
 export const _sendTypingStatus = {
 	name: "发送输入状态",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
 	],
 	action: function({conversationType, targetId, objectName}) {
@@ -248,8 +273,11 @@ export const _sendTypingStatus = {
 
 export const _setMessageSentStatus = {
 	name: "设置消息发送状态",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息id'},
 		{ key: 'status', value: 10, type: 'number', name: '消息状态'},
 	],
 	action: function({messageId, status}) {
@@ -272,8 +300,11 @@ export const _setMessageSentStatus = {
 
 export const _setMessageReceivedStatus = {
 	name: "设置消息接收状态",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息id'},
 		{ key: 'status', value: 10, type: 'number', name: '消息状态'},
 	],
 	action: function({messageId, status}) {
@@ -296,9 +327,13 @@ export const _setMessageReceivedStatus = {
 
 export const _sendReadReceiptMessage = {
 	name: "发送阅读回执",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'timestamp', value: Date.now(), type: 'number'},
 	],
 	action: function({conversationType, targetId, timestamp}) {
@@ -318,8 +353,11 @@ export const _sendReadReceiptMessage = {
 
 export const _sendReadReceiptRequest = {
 	name: "发起群组消息回执请求",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息id'},
 	],
 	action: function({messageId}) {
 		console.log('调用sendReadReceiptRequest方法')
@@ -337,16 +375,18 @@ export const _sendReadReceiptRequest = {
 		
 	}
 }
-
+	
 export const _sendReadReceiptResponse = {
 	name: "发起群组消息回执响应",
 	before: function() {
 		console.log(JSON.stringify(_global))
 		this.params[2].value = JSON.stringify(_global.lastSendMsg)
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'messages', value: config.conversationType, type: 'textarea', name: '会话类型(消息)'},
 	],
 	action: function({conversationType, targetId, messages}) {
@@ -369,71 +409,13 @@ export const _sendReadReceiptResponse = {
 	}
 }
 
-export const _addReadReceiptReceivedListener = {
-	name: "添加私聊阅读回执监听函数",
-	action: function() {
-		console.log('调用addReadReceiptReceivedListener方法')
-		addReadReceiptReceivedListener(
-			(res) => {
-				console.log('received ReadReceiptReceivedListener')
-				console.log(JSON.stringify(res))
-				addPrimaryResult({
-					title: '收到私聊阅读回',
-					code: res,
-					data: res
-				})
-			}
-		)
-		addPrimaryResult({
-			title: '添加私聊阅读回执监听函数'
-		})
-	}
-}
-
-export const _addReceiptRequestListener = {
-	name: "添加收到消息已读回执请求监听函数",
-	action: function() {
-		console.log('调用addReceiptRequestListener方法')
-		addReceiptRequestListener(
-			(res) => {
-				console.log('received addReceiptRequestListener')
-				console.log(JSON.stringify(res))
-				addPrimaryResult({
-					title: '收到消息已读回执请求',
-					data: res
-				})
-			}
-		)
-		addPrimaryResult({
-			title: '添加收到消息已读回执请求监听函数'
-		})
-	}
-}
-
-export const _addReceiptResponseListener = {
-	name: "添加消息回执响应监听函数",
-	action: function() {
-		console.log('调用addReceiptResponseListener方法')
-		addReceiptResponseListener(
-			(res) => {
-				console.log('received addReceiptResponseListener')
-				console.log(JSON.stringify(res))
-				addPrimaryResult({
-					title: '收到消息回执响应',
-					data: res
-				})
-			}
-		)
-		addPrimaryResult({
-			title: '添加消息回执响应监听函数'
-		})
-	}
-}
-
 export const _cancelSendMediaMessage = {
 	name: "取消发送中的媒体消息",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息id'},
 	],
 	action: function({messageId}) {
 		console.log('调用cancelSendMediaMessage方法')
@@ -454,8 +436,11 @@ export const _cancelSendMediaMessage = {
 
 export const _cancelDownloadMediaMessage = {
 	name: "取消下载中的媒体消息",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息id'},
 	],
 	action: function({messageId}) {
 		console.log('调用cancelDownloadMediaMessage方法')
@@ -476,38 +461,40 @@ export const _cancelDownloadMediaMessage = {
 
 export const _downloadMediaMessage = {
 	name: "下载媒体消息",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息id'},
 	],
 	action: function({messageId}) {
 		console.log('调用downloadMediaMessage方法')
 		downloadMediaMessage(
 			messageId,
 			{
-				success: (messageId) => {
+				success: (path) => {
 					addSuccessResult({
-						title: 'sendMediaMessage success',
-						code: messageId,
-						data: messageId
+						title: 'downMediaMessage success',
+						data: path
 					})
 				},
-				  progress: (progress, messageId) => {
+				  progress: (progress) => {
 					  addPrimaryResult({
-					  	title: 'sendMediaMessage progress ',
+					  	title: 'downMediaMessage progress ',
 					  	code: progress,
-					  	data: {messageId, progress}
+					  	data: {progress}
 					  })
 				  },
-				  cancel: (messageId) => {
+				  cancel: () => {
 					  addPrimaryResult({
-					  	title: 'sendMediaMessage cancel',
-					  	data: messageId
+					  	title: 'downMediaMessage cancel',
+					  	data: '取消下载'
 					  })
 				  },
-				  error: (errorCode, messageId) => {
+				  error: (errorCode) => {
 					  addErrorResult({
-					  	title: 'sendMediaMessage error',
-					  	data: {messageId, errorCode}
+					  	title: 'downMediaMessage error',
+					  	data: {errorCode}
 					  })
 				  }
 			}
@@ -518,11 +505,15 @@ export const _downloadMediaMessage = {
 
 export const _getHistoryMessages = {
 	name: "获取历史消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
-		{ key: 'baseMessageId', value: _global.lastReceivedMsg, type: 'number', name: '最近一条消息的 ID'},
+		{ key: 'baseMessageId', value: 0, type: 'number', name: '最近一条消息的 ID'},
 		{ key: 'count', value: 10, type: 'number', name: '数量'},
 		{ key: 'isForward', value: true, type: 'boolean', name: '是否向前获取'},
 	],
@@ -545,9 +536,13 @@ export const _getHistoryMessages = {
 
 export const _getHistoryMessagesByTimestamp = {
 	name: "通过时间戳获取历史消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string', name: '消息类型，多个以,隔开'},
 		{ key: 'timestamp', value: Date.now(), type: 'number', name: '时间戳'},
 		{ key: 'count', value: 10, type: 'number', name: '数量'},
@@ -572,9 +567,13 @@ export const _getHistoryMessagesByTimestamp = {
 
 export const _insertOutgoingMessage = {
 	name: "向本地会话插入一条发送消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'sentStatus', value: 10, type: 'number'},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
 		{ key: 'content', value: 'text content', type: 'string', name: '消息内容'},
@@ -607,20 +606,28 @@ export const _insertOutgoingMessage = {
 
 export const _insertIncomingMessage = {
 	name: "向本地会话插入一条接收消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+		this.params[2].list = config.targetIdList
+		this.params[2].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
+		{ key: 'sendUserId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: 'sendUserId', list: config.targetIdList},
 		{ key: 'status', value: 50, type: 'number'},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
 		{ key: 'content', value: 'text content', type: 'string', name: '消息内容'},
 		{ key: 'extra', value: 'extra info', type: 'string', name: 'extra'},
 		{ key: 'sentTime', value: Date.now(), type: 'number', name: '发送时间'},
 	],
-	action: function({conversationType, targetId, status, objectName, content, extra, sentTime}) {
+	action: function({conversationType, targetId, sendUserId, status, objectName, content, extra, sentTime}) {
 		console.log('调用insertIncomingMessage方法', JSON.stringify(arguments))
 		insertIncomingMessage(
 			conversationType,
 			targetId,
+			sendUserId,
 			status,
 			{
 				objectName: objectName,
@@ -642,9 +649,13 @@ export const _insertIncomingMessage = {
 
 export const _clearMessages = {
 	name: "清空某一会话的所有消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用clearMessages方法')
@@ -665,9 +676,13 @@ export const _clearMessages = {
 
 export const _deleteMessages = {
 	name: "根据会话删除消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用deleteMessages方法')
@@ -688,8 +703,11 @@ export const _deleteMessages = {
 
 export const _deleteMessagesByIds = {
 	name: "根据消息 ID 删除消息",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息Id，多个以,隔开'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息Id，多个以,隔开'},
 	],
 	action: function({messageId}) {
 		console.log('调用deleteMessagesByIds方法')
@@ -709,9 +727,13 @@ export const _deleteMessagesByIds = {
 
 export const _searchMessages = {
 	name: "搜索消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'keyword', value: 'con', type: 'string', name: '关键词'},
 		{ key: 'count', value:10, type: 'number', name: '数量'},
 		{ key: 'startTime', value: 0, type: 'number'},
@@ -724,7 +746,6 @@ export const _searchMessages = {
 			keyword,
 			count,
 			startTime,
-			_global.lastSendMsg,
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
@@ -739,8 +760,11 @@ export const _searchMessages = {
 
 export const _getMessage = {
 	name: "获取消息",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息Id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息Id'},
 	],
 	action: function({messageId}) {
 		console.log('调用getMessage方法')
@@ -760,8 +784,11 @@ export const _getMessage = {
 
 export const _getMessageByUId = {
 	name: "根据消息 UID 获取消息",
+	before: function() {
+		this.params[0].value = _global.lastReceivedMsg ? _global.lastReceivedMsg.messageUId : ''	
+	},
 	params: [
-		{ key: 'messageUId', value: _global.lastSendMsgUId, type: 'string', name: '消息UId'},
+		{ key: 'messageUId', value: '', type: 'string', name: '消息UId'},
 	],
 	action: function({messageUId}) {
 		console.log('调用getMessageByUId方法')
@@ -781,8 +808,11 @@ export const _getMessageByUId = {
 
 export const _setMessageExtra = {
 	name: "设置消息的附加信息",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息Id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息Id'},
 		{ key: 'extra', value: 'extra info', type: 'string', name: 'extra'},
 	],
 	action: function({messageId, extra}) {
@@ -804,8 +834,11 @@ export const _setMessageExtra = {
 
 export const _getMessageSendTime = {
 	name: "获取消息发送时间",
+	before: function() {
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+	},
 	params: [
-		{ key: 'messageId', value: _global.lastSendMsg, type: 'number', name: '消息Id'},
+		{ key: 'messageId', value: 0, type: 'number', name: '消息Id'},
 	],
 	action: function({messageId}) {
 		console.log('调用getMessageSendTime方法')
@@ -825,9 +858,13 @@ export const _getMessageSendTime = {
 
 export const _getMessageCount = {
 	name: "获取会话中的消息数量",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getMessageCount方法')
@@ -848,9 +885,13 @@ export const _getMessageCount = {
 
 export const _getFirstUnreadMessage = {
 	name: "获取会话里第一条未读消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getFirstUnreadMessage方法')
@@ -871,9 +912,13 @@ export const _getFirstUnreadMessage = {
 
 export const _getUnreadMentionedMessages = {
 	name: "获取会话中 @ 提醒自己的消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'}
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 	],
 	action: function({conversationType, targetId}) {
 		console.log('调用getUnreadMentionedMessages方法')
@@ -894,9 +939,13 @@ export const _getUnreadMentionedMessages = {
 
 export const _getRemoteHistoryMessages = {
 	name: "获取服务端历史消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'sentTime', value: Date.now(), type: 'number', name: 'sentTime'},
 		{ key: 'count', value: 10, type: 'number', name: 'count'},
 	],
@@ -921,9 +970,13 @@ export const _getRemoteHistoryMessages = {
 
 export const _cleanRemoteHistoryMessages = {
 	name: "清除服务端历史消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'recordTime', value: Date.now(), type: 'number', name: '截止时间'},
 	],
 	action: function({conversationType, targetId, recordTime}) {
@@ -946,9 +999,13 @@ export const _cleanRemoteHistoryMessages = {
 
 export const _cleanHistoryMessages = {
 	name: "清除历史消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		this.params[1].value = config.targetIdList[0].value
+	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetId, type: 'string', name: '会话id'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'recordTime', value: Date.now(), type: 'number', name: '截止时间'},
 		{ key: 'clearRemote', value: false, type: 'boolean', name: '是否同时删除服务端消息'},
 	],

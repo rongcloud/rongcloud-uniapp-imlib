@@ -40,9 +40,6 @@ import {
 	_sendReadReceiptMessage,
 	_sendReadReceiptRequest,
 	_sendReadReceiptResponse,
-	_addReadReceiptReceivedListener,
-	_addReceiptRequestListener,
-	_addReceiptResponseListener,
 	_cancelSendMediaMessage,
 	_cancelDownloadMediaMessage,
 	_downloadMediaMessage,
@@ -85,14 +82,14 @@ import {
 	_setPushConfig
 } from './other.js'
 
-import { setTestConfig, clearTestConfig } from './testConfig.js'
+import { setTestConfig } from './testConfig.js'
 
 export default [
 	{
 		title: '配置',
 		list: [
 			setTestConfig,
-			clearTestConfig
+			// clearTestConfig
 		]
 	},
 	{
@@ -144,9 +141,6 @@ export default [
 			_sendReadReceiptMessage,
 			_sendReadReceiptRequest,
 			_sendReadReceiptResponse,
-			_addReadReceiptReceivedListener,
-			_addReceiptRequestListener,
-			_addReceiptResponseListener,
 			_cancelSendMediaMessage,
 			_cancelDownloadMediaMessage,
 			_downloadMediaMessage,

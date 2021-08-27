@@ -1,5 +1,5 @@
 // 全局变量
 export default {
-	lastSendMsg: '',
-	lastReceivedMsg: ''
+	lastSendMsg: null,
+	lastReceivedMsg: null
 }

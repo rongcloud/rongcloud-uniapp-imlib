@@ -9,16 +9,16 @@ import {
 import {addSuccessResult, addErrorResult, addPrimaryResult} from '../util/common.js'
 import config from '../config/config.js'
 let baseConfig = uni.getStorageSync('testBaseConfig')
-try{
-	if (baseConfig) {
-		config.appkey = baseConfig.appkey
-		config.token = baseConfig.token
-		config.targetId = baseConfig.targetId
-		config.conversationType = baseConfig.conversationType
-	}
-}catch(e){
-	//TODO handle the exception
-}
+// try{
+// 	if (baseConfig) {
+// 		config.appkey = baseConfig.appkey
+// 		config.token = baseConfig.token
+// 		config.targetId = baseConfig.targetId
+// 		config.conversationType = baseConfig.conversationType
+// 	}
+// }catch(e){
+// 	//TODO handle the exception
+// }
 
 
 export const _joinChatRoom = {

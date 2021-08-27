@@ -11,26 +11,31 @@ import {
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import config from '../config/config.js'
 import initListener from './listener.js'
-let baseConfig = uni.getStorageSync('testBaseConfig')
-try{
-	if (baseConfig) {
-		config.appkey = baseConfig.appkey
-		config.token = baseConfig.token
-		config.targetId = baseConfig.targetId
-		config.conversationType = baseConfig.conversationType
-	}
-}catch(e){
-	//TODO handle the exception
-}
+// let baseConfig = uni.getStorageSync('testBaseConfig')
+// try{
+// 	if (baseConfig) {
+// 		config.appkey = baseConfig.appkey
+// 		config.token = baseConfig.token
+// 		config.targetId = baseConfig.targetId
+// 		config.conversationType = baseConfig.conversationType
+// 	}
+// }catch(e){
+// 	//TODO handle the exception
+// }
 export const _Init = {
 	name: "初始化",
 	action: function() {
+		if (config.navi) {
+			console.log('调用setServerInfo方法')
+			setServerInfo(config.navi)			
+		}
 		console.log('调用初始化方法')
 		console.log(config.appkey)
 		init(config.appkey)
 		
 		addSuccessResult({
-			title: '调用初始化接口'
+			title: '调用初始化接口',
+			data: config.appkey
 		})
 		
 		initListener()
@@ -40,7 +45,7 @@ export const _Init = {
 export const _Connect = {
 	name: "连接",
 	action: function() {
-		console.log('调用连接方法')
+		console.log('调用连接方法', config.token, config.userId)
 		connect(config.token, (result) => {
 			console.log(result)
 			if (result.code === 0) {

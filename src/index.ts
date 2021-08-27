@@ -213,28 +213,35 @@ export interface SentMessageCallback {
   error?: (errorCode: ErrorCode, messageId: number) => void;
 }
 
-function handleSendMessageCallback (callback: SentMessageCallback): string {
-  const eventId = Math.random().toString()
+const RCSendMessageEventMap: {[key: string]: SentMessageCallback} = {}
+
+RCIMClient.addEventListener('rcimlib-send-message', (res: any) => {
+  console.log('媒体消息回调', res.data.eventId)
+  const data = res.data
+  const callback = RCSendMessageEventMap[data.eventId]
   if (callback) {
-    const listener = RCIMClient.addEventListener('rcimlib-send-message', (data: any) => {
-      console.log('媒体消息回调', data.eventId, eventId)
-      if (data.eventId === eventId) {
-        const { success, error, cancel, progress } = callback
-        if (data.type === 'success') {
-          success && success(data.messageId)
-          listener.remove()
-        } else if (data.type === 'error') {
-          error && error(data.errorCode, data.messageId)
-          listener.remove()
-        } else if (data.type === 'cancel') {
-          cancel && cancel(data.messageId)
-          listener.remove()
-        } else if (data.type === 'progress') {
-          progress && progress(data.progress, data.messageId)
-        }
+      const { success, error, cancel, progress } = callback
+      if (data.type === 'success') {
+        success && success(data.messageId)
+        delete RCSendMessageEventMap[data.eventId]
+      } else if (data.type === 'error') {
+        error && error(data.errorCode, data.messageId)
+        delete RCSendMessageEventMap[data.eventId]
+      } else if (data.type === 'cancel') {
+        cancel && cancel(data.messageId)
+        delete RCSendMessageEventMap[data.eventId]
+      } else if (data.type === 'progress') {
+        progress && progress(data.progress, data.messageId)
       }
-    })
   }
+})
+
+function handleSendMessageCallback (callback: SentMessageCallback): string {
+  const eventId = Date.now() + Math.floor((Math.random()*100000)).toString()
+  if (callback) {
+    RCSendMessageEventMap[eventId] = callback
+  }
+  console.log(eventId)
   return eventId
 }
 /**
@@ -244,7 +251,6 @@ function handleSendMessageCallback (callback: SentMessageCallback): string {
  * @param callback 回调
  */
 export function sendMessage (message: SentMessage, callback: (result: SendMessageResult) => {}) {
-  message.content = handleMessageContent(message.content)
   RCIMClient.sendMessage(message, callback)
 }
 
@@ -255,7 +261,7 @@ export function sendMessage (message: SentMessage, callback: (result: SendMessag
  * @param callback 回调
  */
 export function sendMediaMessage (message: SentMessage, callback: SentMessageCallback = {}) {
-  message.content = handleMessageContent(message.content)
+  console.log(message)
   RCIMClient.sendMediaMessage(message, handleSendMessageCallback(callback))
 }
 
@@ -430,6 +436,38 @@ export interface MediaMessageCallback {
   cancel?: () => void;
 }
 
+
+const RCDownMessageEventMap: {[key: string]: MediaMessageCallback} = {}
+
+RCIMClient.addEventListener('rcimlib-download-media-message', (res: any) => {
+  console.log('下载媒体消息回调', res.data.eventId)
+  const data = res.data
+  const callback = RCDownMessageEventMap[data.eventId]
+  if (callback) {
+      const { success, error, cancel, progress } = callback
+      if (data.type === 'success') {
+        success && success(data.path)
+        delete RCDownMessageEventMap[data.eventId]
+      } else if (data.type === 'error') {
+        error && error(data.errorCode)
+        delete RCDownMessageEventMap[data.eventId]
+      } else if (data.type === 'progress') {
+        progress && progress(data.progress)
+      } else if (data.type === 'cancel') {
+        cancel && cancel()
+      }
+  }
+})
+
+function handleDownMessageCallback (callback: MediaMessageCallback): string {
+  const eventId = Date.now() + Math.floor((Math.random()*100000)).toString()
+  if (callback) {
+    RCDownMessageEventMap[eventId] = callback
+  }
+  console.log(eventId)
+  return eventId
+}
+
 /**
  * 下载媒体消息 //down
  *
@@ -437,28 +475,8 @@ export interface MediaMessageCallback {
  * @param callback 回调
  */
 export function downloadMediaMessage (messageId: number, callback: MediaMessageCallback = {}) {
-  const eventId = Math.random().toString()
-  const listener = RCIMClient.addEventListener('rcimlib-download-media-message', (data: any) => {
-    console.log(data)
-    data = data.data
-    if (callback) {
-      if (data.eventId === eventId) {
-        const { success, error, progress, cancel } = callback
-        if (data.type === 'success') {
-          success && success(data.path)
-          listener.remove()
-        } else if (data.type === 'error') {
-          error && error(data.errorCode)
-          listener.remove()
-        } else if (data.type === 'progress') {
-          progress && progress(data.progress)
-        } else if (data.type === 'cancel') {
-          cancel && cancel()
-        }
-      }
-    }
-  })
-  RCIMClient.downloadMediaMessage(messageId, eventId)
+  
+  RCIMClient.downloadMediaMessage(messageId, handleDownMessageCallback(callback))
 }
 
 
