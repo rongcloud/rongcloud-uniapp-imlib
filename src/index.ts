@@ -5,33 +5,17 @@ import {
   ErrorCode,
   Message,
   ObjectName,
-  PublicServiceType,
-  RecallNotificationMessage,
   ReceiptRequest,
   ReceiveMessage,
   SentMessage,
   TypingStatus,
-  ConnectErrorCode,
-  Conversation,
   MessageContent,
-  PublicServiceProfile,
   ReceiptResponse,
-  SearchType,
   SentStatus,
   SearchConversationResult,
   TimestampOrder,
   ChatRoomMemberOrder,
-  ChatRoomInfo,
-  Discussion,
-  RealTimeLocationStatus,
-  CSConfig,
-  CSMode,
-  CSGroupItem,
-  CSInfo,
-  CSResolveStatus,
-  CSLeaveMessageItem,
   PushLanguage,
-  PushNotificationMessage,
   MessageObjectNames,
   ConnectResult,
   UniListenerResult,
@@ -49,7 +33,10 @@ import {
   DraftResult,
   CountResult,
   ChatRoomInfoResult,
-  PushConfig
+  PushConfig,
+  ResponseType,
+  SentProgressMessageCallback,
+  ProgressMessageResult
 } from './types'
 
 const RCIMClient = uni.requireNativePlugin('RCUniIM')
@@ -58,7 +45,7 @@ export * from './types'
 
 const eventEmitter: any = {}
 /**
- * 初始化 SDK，只需要调用一次  //down
+ * 初始化 SDK，只需要调用一次  
  *
  * @param appKey 从融云开发者平台创建应用后获取到的 App Key
  */
@@ -67,13 +54,14 @@ export function init (appKey: string) {
 }
 
 /**
- * 连接融云服务器，只需要调用一次  //down
+ * 连接融云服务器，只需要调用一次  
  *
  * 在 App 整个生命周期，您只需要调用一次此方法与融云服务器建立连接。
  * 之后无论是网络出现异常或者App有前后台的切换等，SDK都会负责自动重连。
  * 除非您已经手动将连接断开，否则您不需要自己再手动重连。
  *
  * @param token 从服务端获取的用户身份令牌（Token）
+ * @param callback 回调函数
  */
  export function connect (
   token: string,
@@ -83,7 +71,7 @@ export function init (appKey: string) {
 }
 
 /**
- * 断开与融云服务器的连接 //down
+ * 断开与融云服务器的连接 
  *
  * @param isReceivePush 是否还接收推送
  */
@@ -92,14 +80,16 @@ export function init (appKey: string) {
 }
 
 /**
- * 添加连接状态监听函数  //down
+ * 添加连接状态监听函数  
+ * 
+ * @param listener 回调函数
  */
  export function addConnectionStatusListener (listener: (result: UniListenerResult<ConnectionListenerResult>) => void) {
   RCIMClient.addEventListener("rcimlib-connection-status", listener);
 }
 
 /**
- * 添加日志信息监听函数 //down
+ * 添加日志信息监听函数 
  *
  * @param listener
  */
@@ -108,7 +98,7 @@ export function addLogInfoListener (listener: (result: UniListenerResult<LogInfo
 }
 
 /**
- * 添加消息撤回监听函数  //down
+ * 添加消息撤回监听函数  
  *
  * @param listener
  */
@@ -117,14 +107,18 @@ export function addRecallMessageListener (listener: (result: UniListenerResult<R
 }
 
 /**
- * 添加消息监听函数 //down
+ * 添加消息监听函数 
+ *
+ * @param listener
  */
  export function addReceiveMessageListener (listener: (result: UniListenerResult<ReceiveMessage>) => void) {
   RCIMClient.addEventListener('rcimlib-receive-message', listener)
 }
 
 /**
- * 添加输入状态监听函数  //down
+ * 添加输入状态监听函数  
+ *
+ * @param listener
  */
  export function addTypingStatusListener (listener: (result: UniListenerResult<TypingStatus>) => void) {
   RCIMClient.addEventListener('rcimlib-typing-status', listener)
@@ -140,7 +134,7 @@ export function addRecallMessageListener (listener: (result: UniListenerResult<R
 // }
 
 /**
- * 同步会话阅读状态 //down
+ * 同步会话阅读状态 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -153,7 +147,6 @@ export function syncConversationReadStatus (
   timestamp: number,
   callback: (result: BaseResult) => void
 ) {
-  console.log(JSON.stringify(arguments))
   RCIMClient.syncConversationReadStatus(conversationType, targetId, timestamp, callback)
 }
 
@@ -171,7 +164,7 @@ export function syncConversationReadStatus (
 // }
 
 /**
- * 设置导航服务器和上传文件服务器信息，要在 [[init]] 前使用 //down
+ * 设置导航服务器和上传文件服务器信息，要在 [[init]] 前使用 
  *
  * @param naviServer 导航服务器地址
  * @param fileServer 文件服务器地址
@@ -181,7 +174,7 @@ export function setServerInfo (naviServer: string, fileServer: string) {
 }
 
 /**
- * 设置统计服务地址 //down
+ * 设置统计服务地址 
  *
  * 配置数据上传地址 (非必须) 通过配置该地址，SDK
  * 会在初始化时把设备相关信息上传到私有云节点。
@@ -197,80 +190,69 @@ export function setStatisticServer (server: string) {
 }
 
 /**
- * 获取当前连接状态  //down
+ * 获取当前连接状态  
+ * 
+ * @param callback 回调函数
  */
 export function getConnectionStatus (callback: (result: {status: ConnectionStatus}) => {}) {
   RCIMClient.getConnectionStatus(callback)
 }
 
-/**
- * 发送消息回调
- */
-export interface SentMessageCallback {
-  success?: (messageId: number) => void;
-  progress?: (progress: number, messageId: number) => void;
-  cancel?: (messageId: number) => void;
-  error?: (errorCode: ErrorCode, messageId: number) => void;
-}
+const RCSendMessageEventMap: {[key: string]: SentProgressMessageCallback} = {}
 
-const RCSendMessageEventMap: {[key: string]: SentMessageCallback} = {}
-
-RCIMClient.addEventListener('rcimlib-send-message', (res: any) => {
-  console.log('媒体消息回调', res.data.eventId)
+RCIMClient.addEventListener('rcimlib-send-message', (res: UniListenerResult<ProgressMessageResult>) => {
   const data = res.data
   const callback = RCSendMessageEventMap[data.eventId]
   if (callback) {
       const { success, error, cancel, progress } = callback
-      if (data.type === 'success') {
+      if (data.type === ResponseType.SUCCESS) {
         success && success(data.messageId)
         delete RCSendMessageEventMap[data.eventId]
-      } else if (data.type === 'error') {
+      } else if (data.type === ResponseType.ERROR) {
         error && error(data.errorCode, data.messageId)
         delete RCSendMessageEventMap[data.eventId]
-      } else if (data.type === 'cancel') {
+      } else if (data.type === ResponseType.CANCEL) {
         cancel && cancel(data.messageId)
         delete RCSendMessageEventMap[data.eventId]
-      } else if (data.type === 'progress') {
+      } else if (data.type === ResponseType.PROGRESS) {
         progress && progress(data.progress, data.messageId)
       }
   }
 })
 
-function handleSendMessageCallback (callback: SentMessageCallback): string {
+function handleSendMessageCallback (callback: SentProgressMessageCallback): string {
   const eventId = Date.now() + Math.floor((Math.random()*100000)).toString()
   if (callback) {
     RCSendMessageEventMap[eventId] = callback
   }
-  console.log(eventId)
   return eventId
 }
 /**
- * 发送消息   //down
+ * 发送消息   
  *
  * @param message 消息
- * @param callback 回调
+ * @param callback 回调函数
  */
 export function sendMessage (message: SentMessage, callback: (result: SendMessageResult) => {}) {
   RCIMClient.sendMessage(message, callback)
 }
 
 /**
- * 发送媒体消息  // down
+ * 发送媒体消息 
  *
  * @param message 消息
- * @param callback 回调
+ * @param callback 回调函数
  */
-export function sendMediaMessage (message: SentMessage, callback: SentMessageCallback = {}) {
-  console.log(message)
+export function sendMediaMessage (message: SentMessage, callback: SentProgressMessageCallback = {}) {
   RCIMClient.sendMediaMessage(message, handleSendMessageCallback(callback))
 }
 
 /**
- * 发送定向消息  //down
+ * 发送定向消息  
  *
  * @param message 消息
  * @param userIdList 用户 ID 列表
- * @param callback 回调
+ * @param callback 回调函数
  */
 export function sendDirectionalMessage (
   message: SentMessage,
@@ -281,10 +263,11 @@ export function sendDirectionalMessage (
 }
 
 /**
- * 消息撤回  //down
+ * 消息撤回  
  *
  * @param messageId 消息 ID
  * @param pushContent 推送内容
+ * @param callback 回调函数
  */
 export function recallMessage (
   messageId: number,
@@ -295,7 +278,7 @@ export function recallMessage (
 }
 
 /**
- * 发送输入状态  //down
+ * 发送输入状态  
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -310,27 +293,29 @@ export function sendTypingStatus (
 }
 
 /**
- * 设置消息发送状态  //down
+ * 设置消息发送状态  
  *
  * @param messageId 消息 ID
  * @param status 状态
+ * @param callback 回调函数
  */
 export function setMessageSentStatus (messageId: number, status: SentStatus, callback: (result: {code: number}) => {}) {
   return RCIMClient.setMessageSentStatus(messageId, status, callback)
 }
 
 /**
- * 设置消息接收状态  //down
+ * 设置消息接收状态  
  *
  * @param messageId 消息 ID
  * @param status 状态
+ * @param callback 回调函数
  */
 export function setMessageReceivedStatus (messageId: number, status: number, callback: (result: {code: number}) => {}) {
   return RCIMClient.setMessageReceivedStatus(messageId, status, callback)
 }
 
 /**
- * 获取屏蔽消息提醒的会话列表 //down
+ * 获取屏蔽消息提醒的会话列表 
  *
  * @param conversationTypeList 消息类型列表会话类型
  * @param callback 回调函数
@@ -343,7 +328,7 @@ export function getBlockedConversationList (
 }
 
 /**
- * 发送阅读回执 //down
+ * 发送阅读回执 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -358,19 +343,20 @@ export function sendReadReceiptMessage (
 }
 
 /**
- * 发起群组消息回执请求 //down
+ * 发起群组消息回执请求 
  *
  * @param messageId 消息 ID
+ * @param callback 回调函数
  */
 export function sendReadReceiptRequest (messageId: number, callback: (result: BaseResult) => void) {
   RCIMClient.sendReadReceiptRequest(messageId, callback)
 }
 
 /**
- * 发起群组消息回执响应 //down
+ * 发起群组消息回执响应 
  *
  * @param conversationType 会话类型
- * @param targetId 目标 ID
+ * @param targetId 会话 ID
  * @param messages 回执的消息列表
  * @param callback 回调函数
  */
@@ -380,6 +366,7 @@ export function sendReadReceiptResponse (
   messages: Message[],
   callback: (result: BaseResult) => void
 ) {
+  console.log(JSON.stringify(arguments))
   RCIMClient.sendReadReceiptResponse(conversationType, targetId, messages, callback)
 }
 
@@ -391,7 +378,7 @@ export function addReadReceiptReceivedListener (listener: (message: UniListenerR
 }
 
 /**
- * 添加收到消息已读回执请求监听函数 //down
+ * 添加收到消息已读回执请求监听函数 
  *
  * 收到此请求后，如果用户阅读了对应的消息，需要调用
  * sendMessageReadReceiptResponse 接口发送已读响应
@@ -401,7 +388,7 @@ export function addReceiptRequestListener (listener: (data: UniListenerResult<Re
 }
 
 /**
- * 添加消息回执响应监听函数 //down
+ * 添加消息回执响应监听函数 
  *
  * @param listener
  */
@@ -410,7 +397,7 @@ export function addReceiptResponseListener (listener: (data: UniListenerResult<R
 }
 
 /**
- * 取消发送中的媒体消息 //down
+ * 取消发送中的媒体消息 
  *
  * @param messageId 消息 ID
  * @param callback 回调函数
@@ -420,7 +407,7 @@ export function cancelSendMediaMessage (messageId: number, callback: (result: Ba
 }
 
 /**
- * 取消下载中的媒体消息 //down
+ * 取消下载中的媒体消息 
  *
  * @param messageId 消息 ID
  * @param callback 回调函数
@@ -435,7 +422,6 @@ export interface MediaMessageCallback {
   error?: (errorCode: number) => void;
   cancel?: () => void;
 }
-
 
 const RCDownMessageEventMap: {[key: string]: MediaMessageCallback} = {}
 
@@ -464,24 +450,22 @@ function handleDownMessageCallback (callback: MediaMessageCallback): string {
   if (callback) {
     RCDownMessageEventMap[eventId] = callback
   }
-  console.log(eventId)
   return eventId
 }
 
 /**
- * 下载媒体消息 //down
+ * 下载媒体消息 
  *
  * @param messageId 消息 ID
  * @param callback 回调
  */
 export function downloadMediaMessage (messageId: number, callback: MediaMessageCallback = {}) {
-  
   RCIMClient.downloadMediaMessage(messageId, handleDownMessageCallback(callback))
 }
 
 
 /**
- * 设置断线重连时是否踢出重连设备  //down
+ * 设置断线重连时是否踢出重连设备  
  *
  * 用户没有开通多设备登录功能的前提下，同一个账号在一台新设备上登录的时候，会把这个账号在之前登录的设备上踢出。
  * 由于 SDK 有断线重连功能，存在下面情况。 用户在 A 设备登录，A
@@ -497,7 +481,7 @@ export function setReconnectKickEnable (enabled: boolean) {
 }
 
 /**
- * 获取历史消息 //down
+ * 获取历史消息 
  *
  * 此方法会获取该会话中，baseMessageId 之前或之后的、指定数量、消息类型和查询方向的最新消息实体，返回的消息实体按照时间从新到旧排列。
  * 返回的消息中不包含 baseMessageId 对应的那条消息，如果会话中的消息数量小于参数 count 的值，会将该会话中的所有消息返回。
@@ -508,6 +492,7 @@ export function setReconnectKickEnable (enabled: boolean) {
  * @param baseMessageId 最近一条消息的 ID
  * @param count 数量
  * @param isForward 是否向前获取
+ * @param callback 回调函数
  */
 export function getHistoryMessages (
   conversationType: ConversationType,
@@ -531,7 +516,7 @@ export function getHistoryMessages (
 
 
 /**
- * 通过时间戳获取历史消息 //down
+ * 通过时间戳获取历史消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -539,6 +524,7 @@ export function getHistoryMessages (
  * @param timestamp 时间戳
  * @param count 数量
  * @param isForward 是否向前获取
+ * @param callback 回调函数
  */
  export function getHistoryMessagesByTimestamp (
   conversationType: ConversationType,
@@ -561,24 +547,14 @@ export function getHistoryMessages (
 }
 
 /**
- * 消息内容兼容性处理
- */
-function handleMessageContent (content: MessageContent) {
-  if (!content.objectName) {
-    // @ts-ignore
-    content.objectName = MessageObjectNames[content.type]
-  }
-  return content
-}
-
-/**
- * 向本地会话插入一条发送消息 //down
+ * 向本地会话插入一条发送消息 
  *
  * @param conversationType
  * @param targetId
  * @param sentStatus
  * @param messageContent
  * @param sentTime
+ * @param callback 回调函数
  */
 export function insertOutgoingMessage (
   conversationType: ConversationType,
@@ -599,7 +575,7 @@ export function insertOutgoingMessage (
 }
 
 /**
- * 向本地会话插入一条接收消息 //down
+ * 向本地会话插入一条接收消息 
  *
  * @param conversationType
  * @param targetId
@@ -618,7 +594,6 @@ export function insertIncomingMessage (
   sentTime = 0,
   callback: (result: MessageResult) => void
 ){
-  console.log(JSON.stringify(arguments))
   RCIMClient.insertIncomingMessage(
     conversationType,
     targetId,
@@ -631,7 +606,7 @@ export function insertIncomingMessage (
 }
 
 /**
- * 清空某一会话的所有消息 //down
+ * 清空某一会话的所有消息 
  *
  * @param conversationType
  * @param targetId
@@ -646,7 +621,7 @@ export function clearMessages (
 }
 
 /**
- * 根据消息 ID 删除消息 //down
+ * 根据消息 ID 删除消息 
  *
  * @param ids 消息 ID 列表
  * @param callback 回调函数
@@ -659,7 +634,7 @@ export function deleteMessagesByIds (
 }
 
 /**
- * 根据会话删除消息 //down
+ * 根据会话删除消息 
  *
  * @param type 会话类型
  * @param targetId 会话 ID
@@ -674,7 +649,7 @@ export function deleteMessages (
 }
 
 /**
- * 根据关键字搜索会话 //down
+ * 根据关键字搜索会话 
  *
  * @param keyword 关键字
  * @param conversationTypes 会话类型数组
@@ -691,7 +666,7 @@ export function searchConversations (
 }
 
 /**
- * 搜索消息 //down
+ * 搜索消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -712,7 +687,7 @@ export function searchMessages (
 }
 
 /**
- * 获取消息 //down
+ * 获取消息 
  *
  * @param messageId 消息 ID
  * @param callback 回调函数
@@ -722,7 +697,7 @@ export function getMessage (messageId: number, callback: (result: MessageResult)
 }
 
 /**
- * 根据消息 UID 获取消息 //down
+ * 根据消息 UID 获取消息 
  *
  * @param messageUId 消息 UID
  * @param callback 回调函数
@@ -732,7 +707,7 @@ export function getMessageByUId (messageUId: string, callback: (result: MessageR
 }
 
 /**
- * 设置消息的附加信息 //down
+ * 设置消息的附加信息 
  *
  * @param messageId 消息 ID
  * @param extra 附加信息
@@ -743,7 +718,7 @@ export function setMessageExtra (messageId: number, extra: string, callback: (re
 }
 
 /**
- * 获取消息发送时间 //down
+ * 获取消息发送时间 
  *
  * @param messageId 消息 ID
  * @param callback 回调函数
@@ -753,7 +728,7 @@ export function getMessageSendTime (messageId: number, callback: (result: number
 }
 
 /**
- * 获取会话中的消息数量 //down
+ * 获取会话中的消息数量 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -768,10 +743,11 @@ export function getMessageCount (
 }
 
 /**
- * 获取会话里第一条未读消息 //down
+ * 获取会话里第一条未读消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
+ * @param callback 回调函数
  */
 export function getFirstUnreadMessage (
   conversationType: ConversationType,
@@ -782,10 +758,11 @@ export function getFirstUnreadMessage (
 }
 
 /**
- * 获取会话中 @ 提醒自己的消息  //down
+ * 获取会话中 @ 提醒自己的消息  
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
+ * @param callback 回调函数
  */
 export function getUnreadMentionedMessages (
   conversationType: ConversationType,
@@ -796,12 +773,13 @@ export function getUnreadMentionedMessages (
 }
 
 /**
- * 获取服务端历史消息 //down
+ * 获取服务端历史消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
  * @param sentTime 清除消息截止时间戳，为 0 则清除会话所有服务端历史消息
  * @param count 删除数量
+ * @param callback 回调函数
  */
 export function getRemoteHistoryMessages (
   conversationType: ConversationType,
@@ -814,11 +792,12 @@ export function getRemoteHistoryMessages (
 }
 
 /**
- * 清除服务端历史消息 //down
+ * 清除服务端历史消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
  * @param recordTime 清除消息截止时间戳，为 0 则清除会话所有服务端历史消息
+ * @param callback 回调函数
  */
 export function cleanRemoteHistoryMessages (
   conversationType: ConversationType,
@@ -830,12 +809,13 @@ export function cleanRemoteHistoryMessages (
 }
 
 /**
- * 清除历史消息 //down
+ * 清除历史消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
  * @param recordTime 清除消息截止时间戳，为 0 则清除会话所有服务端历史消息
  * @param clearRemote 是否同时删除服务端消息
+ * @param callback 回调函数
  */
 export function cleanHistoryMessages (
   conversationType: ConversationType,
@@ -864,7 +844,7 @@ export function cleanHistoryMessages (
 // }
 
 /**
- * 获取会话 //down
+ * 获取会话 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -879,12 +859,11 @@ export function getConversation (
 }
 
 /**
- * 获取会话列表 //down
+ * 获取会话列表 
  *
  * @param conversationTypes 会话类型列表
  * @param count 获取的数量
- * @param timestamp 会话的时间戳（获取这个时间戳之前的会话列表，0
- *     表示从最新开始获取）会话类型
+ * @param timestamp 会话的时间戳（获取这个时间戳之前的会话列表，0 表示从最新开始获取）会话类型
  * @param callback 回调函数
  */
 export function getConversationList (
@@ -898,7 +877,7 @@ export function getConversationList (
 }
 
 /**
- * 从会话列表中移除某一会话，但是不删除会话内的消息 //down
+ * 从会话列表中移除某一会话，但是不删除会话内的消息 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -913,7 +892,7 @@ export function removeConversation (
 }
 
 /**
- * 设置会话消息提醒状态 //down
+ * 设置会话消息提醒状态 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -930,7 +909,7 @@ export function setConversationNotificationStatus (
 }
 
 /**
- * 获取会话消息提醒状态 //down
+ * 获取会话消息提醒状态 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -945,7 +924,7 @@ export function getConversationNotificationStatus (
 }
 
 /**
- * 设置是否置顶会话 //down
+ * 设置是否置顶会话 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -962,7 +941,7 @@ export function setConversationToTop (
 }
 
 /**
- * 获取置顶会话列表 //down
+ * 获取置顶会话列表 
  *
  * @param conversationTypes 会话类型列表
  * @param callback 回调函数
@@ -975,7 +954,7 @@ export function getTopConversationList (
 }
 
 /**
- * 保存某一会话的文本消息草稿 //down
+ * 保存某一会话的文本消息草稿 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -992,7 +971,7 @@ export function saveTextMessageDraft (
 }
 
 /**
- * 获取某一会话的文本消息草稿 //down
+ * 获取某一会话的文本消息草稿 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -1007,7 +986,7 @@ export function getTextMessageDraft (
 }
 
 /**
- * 清除某一会话的文本消息草稿 //down
+ * 清除某一会话的文本消息草稿 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -1022,7 +1001,7 @@ export function clearTextMessageDraft (
 }
 
 /**
- * 获取所有未读消息数 //down
+ * 获取所有未读消息数 
  * 
  * @param callback 回调函数
  */
@@ -1031,7 +1010,7 @@ export function getTotalUnreadCount (callback: (result: CountResult) => void) {
 }
 
 /**
- * 获取指定会话的未读消息数 //down
+ * 获取指定会话的未读消息数 
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -1049,7 +1028,7 @@ export function getUnreadCount (
 }
 
 /**
- * 清除某个会话中的未读消息数  //down
+ * 清除某个会话中的未读消息数  
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
@@ -1066,7 +1045,7 @@ export function clearMessagesUnreadStatus (
 }
 
 /**
- * 把用户加入黑名单 //down
+ * 把用户加入黑名单 
  *
  * @param userId 用户 ID
  * @param callback 回调函数
@@ -1076,7 +1055,7 @@ export function addToBlacklist (userId: string, callback: (result: BaseResult) =
 }
 
 /**
- * 把用户从黑名单中移除 //down
+ * 把用户从黑名单中移除 
  *
  * @param userId 用户 ID
  * @param callback 回调函数
@@ -1086,7 +1065,7 @@ export function removeFromBlacklist (userId: string, callback: (result: BaseResu
 }
 
 /**
- * 获取某用户是否在黑名单中  //down
+ * 获取某用户是否在黑名单中  
  *
  * @param userId 用户 ID
  * @param callback 回调函数
@@ -1096,7 +1075,7 @@ export function getBlacklistStatus (userId: string, callback: (result: statusRes
 }
 
 /**
- * 获取黑名单列表 //down
+ * 获取黑名单列表 
  *
  * @param 回调函数
  */
@@ -1105,7 +1084,7 @@ export function getBlacklist (callback: (result: {code: number, list?: string[]}
 }
 
 /**
- * 加入聊天室，如果已存在，直接加入，否则创建并加入 //down
+ * 加入聊天室，如果已存在，直接加入，否则创建并加入 
  *
  * @param targetId 聊天室 ID
  * @param messageCount 默认获取的消息数量，最多 50
@@ -1116,7 +1095,7 @@ export function joinChatRoom (targetId: string, messageCount: number = 10, callb
 }
 
 /**
- * 加入已存在的聊天室，如果不存在则加入失败 //down
+ * 加入已存在的聊天室，如果不存在则加入失败 
  *
  * @param targetId 聊天室 ID
  * @param messageCount 默认获取的消息数量，最多 50
@@ -1127,7 +1106,7 @@ export function joinExistChatRoom (targetId: string, messageCount = 10, callback
 }
 
 /**
- * 退出聊天室 //down
+ * 退出聊天室 
  *
  * @param targetId 聊天室 ID
  * @param callback 回调函数
@@ -1137,7 +1116,7 @@ export function quitChatRoom (targetId: string, callback: (result: BaseResult) =
 }
 
 /**
- * 从服务器端获取聊天室的历史消息 //down
+ * 从服务器端获取聊天室的历史消息 
  *
  * @param targetId 目标 ID
  * @param recordTime 起始的消息发送时间戳，单位毫秒
@@ -1156,7 +1135,7 @@ export function getRemoteChatRoomHistoryMessages (
 }
 
 /**
- * 获取聊天室信息  //down
+ * 获取聊天室信息  
  *
  * @param targetId 聊天室 ID
  * @param memberCount 聊天室成员数量，最多获取 20 个
@@ -1173,7 +1152,7 @@ export function getChatRoomInfo (
 }
 
 /**
- * 全局屏蔽某个时间段的消息提醒 //down
+ * 全局屏蔽某个时间段的消息提醒 
  *
  * @param startTime 开始屏蔽消息提醒的时间，格式为HH:MM:SS
  * @param spanMinutes 需要屏蔽消息提醒的分钟数，0 < spanMinutes < 1440
@@ -1184,7 +1163,7 @@ export function setNotificationQuietHours (startTime: string, spanMinutes: numbe
 }
 
 /**
- * 查询已设置的全局时间段消息提醒屏蔽 //down
+ * 查询已设置的全局时间段消息提醒屏蔽 
  * 
  * @param callback 回调函数
  */
@@ -1193,7 +1172,7 @@ export function getNotificationQuietHours (callback: (result: { startTime: strin
 }
 
 /**
- * 删除已设置的全局时间段消息提醒屏蔽 //down
+ * 删除已设置的全局时间段消息提醒屏蔽 
  * 
  * @param callback 回调函数
  */
@@ -1202,21 +1181,23 @@ export function removeNotificationQuietHours (callback: (result: BaseResult) => 
 }
 
 /**
- * 获取离线消息在服务端的存储时间（以天为单位）//down
+ * 获取离线消息在服务端的存储时间（以天为单位）
  */
 export function getOfflineMessageDuration (callback: (result: {code: number, duration: number}) => void) {
   RCIMClient.getOfflineMessageDuration(callback)
 }
 
 /**
- * 设置离线消息在服务端的存储时间（以天为单位）  //down
+ * 设置离线消息在服务端的存储时间（以天为单位）  
+ * 
+ * @param callback 回调函数
  */
-export async function setOfflineMessageDuration (duration: number, callback: (result: BaseResult) => void) {
-  parseInt(await RCIMClient.setOfflineMessageDuration(duration, callback))
+export function setOfflineMessageDuration (duration: number, callback: (result: BaseResult) => void) {
+  RCIMClient.setOfflineMessageDuration(duration, callback)
 }
 
 /**
- * 获取当前用户 ID  //down
+ * 获取当前用户 ID  
  * 
  * @param callback 回调函数
  */
@@ -1225,19 +1206,19 @@ export function getCurrentUserId (callback: (result: {userId: string}) => void) 
 }
 
 /**
- * 设置推送语言  //down
+ * 设置推送语言  
  *
  * @param language 推送语言
+ * @param callback 回调函数
  */
 export function setPushLanguageCode (language: PushLanguage, callback: (result: BaseResult) => void) {
   RCIMClient.setPushLanguageCode(language, callback)
 }
 
 /**
- * 设置是否显示内容详情 //down
+ * 设置是否显示内容详情 
  *
  * @param isShowPushContent 是否显示内容详情
- * 
  * @param callback 回调函数
  */
 export function setPushContentShowStatus (isShowPushContent: boolean, callback: (result: BaseResult) => void){
@@ -1245,7 +1226,7 @@ export function setPushContentShowStatus (isShowPushContent: boolean, callback: 
 }
 
 /**
- * 查询是否显示内容详情 //down
+ * 查询是否显示内容详情 
  * 
  * @param callback 回调函数
  */

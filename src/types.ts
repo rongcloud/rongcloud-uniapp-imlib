@@ -599,7 +599,9 @@ export interface ConnectionListenerResult {
 
 export enum ResponseType {
   SUCCESS = 'success',
-  ERROR = 'error'
+  ERROR = 'error',
+  CANCEL = 'cancel',
+  PROGRESS = 'progress',
 }
 /**
  * 连接回调 
@@ -966,120 +968,6 @@ export enum RealTimeLocationStatus {
 }
 
 /**
- * 客服信息
- */
-export interface CSInfo {
-  userId?: string;
-  nickName?: string;
-  loginName?: string;
-  name?: string;
-  grade?: string;
-  age?: string;
-  profession?: string;
-  portraitUrl?: string;
-  province?: string;
-  city?: string;
-  memo?: string;
-  mobileNo?: string;
-  email?: string;
-  address?: string;
-  QQ?: string;
-  weibo?: string;
-  weixin?: string;
-  page?: string;
-  referrer?: string;
-  enterUrl?: string;
-  skillId?: string;
-  listUrl?: string;
-  define?: string;
-  productId?: string;
-}
-
-/**
- * 留言消息类型
- */
-export enum LeaveMessageType {
-  NATIVE,
-  WEB
-}
-
-/**
- * 客服问题解决状态
- */
-export enum CSResolveStatus {
-  UNRESOLVED,
-  RESOLVED,
-  RESOLVING
-}
-
-/**
- * 客服评价时机
- */
-export enum CSEvaEntryPoint {
-  LEAVE,
-  EXTENSION,
-  NONE,
-  END
-}
-
-/**
- * 客服留言
- */
-export interface CSLeaveMessageItem {
-  name?: string;
-  title?: string;
-  type?: string;
-  defaultText?: string;
-  required?: boolean;
-  message?: string;
-  verification?: string;
-  max?: number;
-}
-
-/**
- * 客服配置
- */
-export interface CSConfig {
-  isBlack: boolean;
-  companyName: string;
-  companyUrl: string;
-  companyIcon: string;
-  announceClickUrl: string;
-  announceMsg: string;
-  leaveMessageNativeInfo: CSLeaveMessageItem[];
-  leaveMessageType: LeaveMessageType;
-  userTipTime: number;
-  userTipWord: string;
-  adminTipTime: number;
-  adminTipWord: string;
-  evaEntryPoint: CSEvaEntryPoint;
-  evaType: number;
-  robotSessionNoEva: boolean;
-  humanEvaluateItems: { value: number; description: string }[];
-  isReportResolveStatus: boolean;
-  isDisableLocation: boolean;
-}
-
-/**
- * 客服服务模式
- */
-export enum CSMode {
-  NO_SERVICE,
-  ROBOT_ONLY,
-  HUMAN_ONLY,
-  ROBOT_FIRST
-}
-
-/**
- * 客服分组信息
- */
-export interface CSGroupItem {
-  id: string;
-  name: string;
-  isOnline: boolean;
-}
-
-/**
  * 推送语言
  */
 export enum PushLanguage {
@@ -1108,6 +996,9 @@ export interface PushNotificationMessage {
   extra: string;
 }
 
+/**
+ * 推送配置
+ */
 export interface PushConfig {
   FCM: boolean,
   HW: boolean,
@@ -1124,4 +1015,25 @@ export interface PushConfig {
     OPPO_PUSH_APPID: string,
     OPPO_PUSH_APPKEY: string
   }
+}
+
+/**
+ * 发送进度消息回调
+ */
+ export interface SentProgressMessageCallback {
+  success?: (messageId: number) => void;
+  progress?: (progress: number, messageId: number) => void;
+  cancel?: (messageId: number) => void;
+  error?: (errorCode: ErrorCode, messageId: number) => void;
+}
+
+/**
+ * 发送进度消息回调参数
+*/ 
+export interface ProgressMessageResult {
+  type: ResponseType,
+  eventId: string,
+  messageId: number,
+  progress: number,
+  errorCode: number
 }
