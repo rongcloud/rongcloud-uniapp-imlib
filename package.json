@@ -12,7 +12,8 @@
     "build": "rollup -c scripts/rollup.prod.js",
     "build:dev": "rollup -c scripts/rollup.dev.js",
     "release": "node scripts/release.prod",
-    "release:dev": "node scripts/release.dev"
+    "release:dev": "node scripts/release.dev",
+    "doc": "npx typedoc src/index.ts"
   },
   "repository": {
     "type": "git"
