@@ -8,7 +8,6 @@
   },
   "types": "./dist/index.d.ts",
   "module": "./dist/index.esm.js",
-  "unpkg": "./dist/index.umd.js",
   "scripts": {
     "build": "rollup -c scripts/rollup.prod.js",
     "build:dev": "rollup -c scripts/rollup.dev.js",

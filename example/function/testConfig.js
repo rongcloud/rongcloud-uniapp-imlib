@@ -1,17 +1,7 @@
 // 测试基础信息配置
 import config from '../config/config.js'
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
-// let baseConfig = uni.getStorageSync('testBaseConfig')
-// try{
-// 	if (baseConfig) {
-// 		config.appkey = baseConfig.appkey
-// 		config.token = baseConfig.token
-// 		config.targetId = baseConfig.targetId
-// 		config.conversationType = baseConfig.conversationType
-// 	}
-// }catch(e){
-// 	//TODO handle the exception
-// }
+
 const userList = config.userList.map(i => {
 	return {
 		label: i.appkey + '_' + i.userId,
@@ -26,18 +16,18 @@ export const setTestConfig = {
 		{ key: 'account', value: userList[0].value, valueIndex: 0, type: 'picker', list: userList, name: '选择账号'},
 		// { key: 'appkey', value: config.appkey, type: 'string'},
 		// { key: 'token', value: config.token, type: 'textarea'},
-		{ key: 'targetId', value: config.targetId, type: 'string'},
-		{ key: 'conversationType', value: config.conversationType, type: 'number'},
+		// { key: 'targetId', value: config.targetId, type: 'string'},
+		// { key: 'conversationType', value: config.conversationType, type: 'number'},
 		// { key: 'test', value: config.test || false, type: 'boolean'},
 	],
-	action: ({targetId, conversationType, account}) => {
+	action: ({account}) => {
 		console.log(targetId, conversationType, account)
 		config.appkey = account.appkey
 		config.token = account.token
 		config.userId = account.userId
 		config.navi = account.navi
-		config.targetId = targetId
-		config.conversationType = conversationType
+		// config.targetId = targetId
+		// config.conversationType = conversationType
 		console.log(config)
 		// uni.setStorageSync('testBaseConfig', config)
 		addSuccessResult({

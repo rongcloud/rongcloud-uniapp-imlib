@@ -11,17 +11,6 @@ import {
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import config from '../config/config.js'
 import initListener from './listener.js'
-// let baseConfig = uni.getStorageSync('testBaseConfig')
-// try{
-// 	if (baseConfig) {
-// 		config.appkey = baseConfig.appkey
-// 		config.token = baseConfig.token
-// 		config.targetId = baseConfig.targetId
-// 		config.conversationType = baseConfig.conversationType
-// 	}
-// }catch(e){
-// 	//TODO handle the exception
-// }
 export const _Init = {
 	name: "初始化",
 	action: function() {

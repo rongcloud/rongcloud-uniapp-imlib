@@ -193,7 +193,7 @@
 		overflow: scroll;
 	}
 	.footer {
-		padding: 7px;
+		padding: 10px 7px;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

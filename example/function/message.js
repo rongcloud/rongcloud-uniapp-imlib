@@ -10,6 +10,7 @@ import {
 	setMessageReceivedStatus,
 	sendReadReceiptMessage,
 	sendReadReceiptRequest,
+	sendReadReceiptResponse,
 	cancelSendMediaMessage,
 	cancelDownloadMediaMessage,
 	downloadMediaMessage,
@@ -41,11 +42,11 @@ export const _sendMessage = {
 	name: "发送消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
+		{ key: 'targetId', value: null, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
 		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
 		{ key: 'content', value: 'content info', type: 'string', name: '消息内容'},
 		{ key: 'extra', value: 'extra info', type: 'string'},
@@ -118,7 +119,7 @@ export const _sendMediaMessage = {
 	name: "发送媒体消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -128,6 +129,7 @@ export const _sendMediaMessage = {
 		console.log('调用sendMediaMessage方法')
 		uni.chooseImage({
 			count: 1,
+			sourceType: ['album'],
 			success: (res) => {
 				if (res.tempFilePaths.length < 0) return
 				uni.getImageInfo({
@@ -186,7 +188,7 @@ export const _sendDirectionalMessage = {
 	name: "发送定向消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -250,7 +252,7 @@ export const _sendTypingStatus = {
 	name: "发送输入状态",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -329,7 +331,7 @@ export const _sendReadReceiptMessage = {
 	name: "发送阅读回执",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -379,33 +381,33 @@ export const _sendReadReceiptRequest = {
 export const _sendReadReceiptResponse = {
 	name: "发起群组消息回执响应",
 	before: function() {
-		console.log(JSON.stringify(_global))
-		this.params[2].value = JSON.stringify(_global.lastSendMsg)
-		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		this.params[1].value = _global.lastReadReceiptRequestMsg ? _global.lastReadReceiptRequestMsg.targetId : ''
+		this.params[2].value = _global.lastReadReceiptRequestMsg ? _global.lastReadReceiptRequestMsg.messageUId : ''
 	},
 	params: [
-		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
-		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
-		{ key: 'messages', value: config.conversationType, type: 'textarea', name: '会话类型(消息)'},
+		{ key: 'conversationType', value: 3, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: '',  type: 'string', name: '会话id'},
+		{ key: 'messageUId', value: '', type: 'string', name: '消息UId'},
 	],
-	action: function({conversationType, targetId, messages}) {
+	action: function({conversationType, targetId, messageUId}) {
 		console.log('调用sendReadReceiptResponse方法')
-		const msgs = JSON.parse(messages.replace('\n', '').replace('\t', ''))
-		sendReadReceiptResponse(
-			conversationType,
-			targetId,
-		 	msgs,
-			(res) => {
-				console.log(JSON.stringify(res))
-				addPrimaryResult({
-					title: 'sendReadReceiptResponse',
-					code: res.code,
-					data: res
-				})
-			}
-		)
-		
+		getMessageByUId(messageUId, (msg) => {
+			sendReadReceiptResponse(
+				conversationType,
+				targetId,
+			 	[
+					msg.message
+				],
+				(res) => {
+					console.log(JSON.stringify(res))
+					addPrimaryResult({
+						title: 'sendReadReceiptResponse',
+						code: res.code,
+						data: res
+					})
+				}
+			)
+		})
 	}
 }
 
@@ -507,7 +509,7 @@ export const _getHistoryMessages = {
 	name: "获取历史消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -538,7 +540,7 @@ export const _getHistoryMessagesByTimestamp = {
 	name: "通过时间戳获取历史消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -569,7 +571,7 @@ export const _insertOutgoingMessage = {
 	name: "向本地会话插入一条发送消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -608,7 +610,7 @@ export const _insertIncomingMessage = {
 	name: "向本地会话插入一条接收消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 		this.params[2].list = config.targetIdList
 		this.params[2].value = config.targetIdList[0].value
 	},
@@ -651,7 +653,7 @@ export const _clearMessages = {
 	name: "清空某一会话的所有消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -678,7 +680,7 @@ export const _deleteMessages = {
 	name: "根据会话删除消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -729,7 +731,7 @@ export const _searchMessages = {
 	name: "搜索消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -860,7 +862,7 @@ export const _getMessageCount = {
 	name: "获取会话中的消息数量",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -887,7 +889,7 @@ export const _getFirstUnreadMessage = {
 	name: "获取会话里第一条未读消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -914,7 +916,7 @@ export const _getUnreadMentionedMessages = {
 	name: "获取会话中 @ 提醒自己的消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -941,7 +943,7 @@ export const _getRemoteHistoryMessages = {
 	name: "获取服务端历史消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -972,7 +974,7 @@ export const _cleanRemoteHistoryMessages = {
 	name: "清除服务端历史消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
@@ -1001,7 +1003,7 @@ export const _cleanHistoryMessages = {
 	name: "清除历史消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
-		this.params[1].value = config.targetIdList[0].value
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
 	},
 	params: [
 		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},

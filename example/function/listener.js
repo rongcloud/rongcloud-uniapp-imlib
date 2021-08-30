@@ -70,6 +70,7 @@ const initListener = function() {
 	
 	addReceiptRequestListener(
 		(res) => {
+			_global.lastReadReceiptRequestMsg = res.data
 			addPrimaryResult({
 				title: '收到消息已读回执请求',
 				data: res
