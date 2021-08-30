@@ -177,8 +177,17 @@ export enum ObjectName {
  * 消息内容
  */
 export interface MessageContent {
+  /**
+   * 消息对象名称
+   */
   objectName?: ObjectName;
+  /**
+   * 用户信息
+   */
   userInfo?: UserInfo;
+  /**
+   * 提醒信息
+   */
   mentionedInfo?: MentionedInfo;
 }
 
