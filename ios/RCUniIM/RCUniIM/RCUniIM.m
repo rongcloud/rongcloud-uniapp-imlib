@@ -116,6 +116,8 @@ UNI_EXPORT_METHOD_SYNC(@selector(sendMessage:callback:));
                 callback(@{@"code":@(nErrorCode),@"messageId":@(messageId)},NO);
             }
         }];
+    
+
 }
 
 UNI_EXPORT_METHOD_SYNC(@selector(sendMediaMessage:eventId:));
@@ -537,7 +539,14 @@ UNI_EXPORT_METHOD(@selector(sendReadReceiptResponse: targetId: messages: callbac
 - (void)sendReadReceiptResponse:(int)conversationType targetId:(NSString *)targetId messages:(NSArray *)messages callback:(UniModuleKeepAliveCallback)callback {//done
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:messages.count];
     for (int i = 0; i < messages.count; i += 1) {//done
-      array[i] = [self fromMessage:messages[i]];
+      NSDictionary *message = messages[i];
+      RCMessage *msg = [RCMessage new];
+      msg.conversationType = [message[@"conversationType"] intValue];
+      msg.targetId = message[@"targetId"];
+      msg.content = [self toMessageContent:message[@"content"]];
+      msg.messageUId = message[@"messageUId"];
+      msg.senderUserId = message[@"senderUserId"];
+      array[i] = msg;
     }
     [RCCoreClient.sharedCoreClient sendReadReceiptResponse:conversationType targetId:targetId messageList:array success:^{
             if(callback) {
@@ -1034,8 +1043,9 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     messageContent = text;
   } else if ([objectName isEqualToString:@"RC:ImgMsg"]) {
     NSString *local = content[@"local"];
+    local = [local stringByReplacingOccurrencesOfString:@"file://" withString:@""];
     RCImageMessage *image = [RCImageMessage
-        messageWithImageURI:[local stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+        messageWithImageURI:local];
     image.extra = content[@"extra"];
     messageContent = image;
   } else if ([objectName isEqualToString:@"RC:FileMsg"]) {
