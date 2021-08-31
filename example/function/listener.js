@@ -10,11 +10,12 @@ import {
 	addReadReceiptReceivedListener,
 	addReceiptRequestListener,
 	addReceiptResponseListener
-} from "../../dist"
+} from "@rongcloud/imlib-uni"
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import _global from '../config/global.js'
 
 const initListener = function() {
+	console.log('初始化监听')
 	addConnectionStatusListener((res) => {
 		addPrimaryResult({
 			title: 'connection status change',

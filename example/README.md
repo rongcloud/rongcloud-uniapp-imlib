@@ -7,14 +7,14 @@
 npm install
 ```
 
-2. 创建 npm 包软链
-```
-npm link
-```
-
-3. 编译
+2. 编译
 ```
 npm run build:dev
+```
+
+3. 创建 npm 包软链
+```
+npm link
 ```
 
 ## uniapp-native-plugin-demo
@@ -34,6 +34,4 @@ npm link @rongcloud/imlib-uni
 5. 运行 -> 运行到手机 -> 制作自定义调试基座
 
 6. 运行 -> 运行到手机 -> 运行基座选择 -> 选择自定义基座
-
-
 

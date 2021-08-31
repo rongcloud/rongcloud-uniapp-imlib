@@ -1,5 +1,5 @@
 {
-  "name": "imlib-uni",
+  "name": "@rongcloud/imlib-uni",
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
@@ -42,6 +42,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-dts": "^2.0.1",
     "rollup-plugin-terser": "^7.0.2",
+    "tslib": "^2.3.1",
     "typedoc": "^0.21.9",
     "typescript": "^4.1.3",
     "validate-commit-msg": "^2.14.0"

@@ -7,10 +7,23 @@ import {
 	setDeviceToken,
 	setServerInfo,
 	getConnectionStatus
-} from "../../dist"
+} from "@rongcloud/imlib-uni"
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import config from '../config/config.js'
 import initListener from './listener.js'
+
+
+export const _InitListener = {
+	name: "添加事件监听",
+	action: function() {
+		initListener()
+		
+		addSuccessResult({
+			title: '添加事件监听',
+		})
+	}
+}
+
 export const _Init = {
 	name: "初始化",
 	action: function() {
@@ -26,8 +39,6 @@ export const _Init = {
 			title: '调用初始化接口',
 			data: config.appkey
 		})
-		
-		initListener()
 	}
 }
 

@@ -22,7 +22,7 @@ import {
 	removeFromBlacklist,
 	getBlacklistStatus,
 	getBlacklist,
-} from "../../dist"
+} from "@rongcloud/imlib-uni"
 import {addSuccessResult, addErrorResult, addPrimaryResult} from '../util/common.js'
 import config from '../config/config.js'
 

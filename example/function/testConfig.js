@@ -21,7 +21,7 @@ export const setTestConfig = {
 		// { key: 'test', value: config.test || false, type: 'boolean'},
 	],
 	action: ({account}) => {
-		console.log(targetId, conversationType, account)
+		console.log(account)
 		config.appkey = account.appkey
 		config.token = account.token
 		config.userId = account.userId

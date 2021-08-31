@@ -5,7 +5,8 @@ import { _Init,
   _SetDeviceToken, 
   _SetServerInfo,
   _setStatisticServer,
-  _getConnectionStatus
+  _getConnectionStatus,
+  _InitListener
  } from "./base.js"
 import { 
   _GetConversationList,
@@ -95,6 +96,7 @@ export default [
 	{
 		title: '基础接口',
 		list: [
+			_InitListener,
 			_Init,
 			_Connect,
 			_Disconnect,

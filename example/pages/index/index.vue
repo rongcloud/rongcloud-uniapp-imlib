@@ -103,7 +103,6 @@
 	import { statusColor, isObject, isArray } from '../../util/utils.js'
 	import config from '../../config/config.js'
 	// import wgJsonView from '@/components/wg-json-view/wg-json-view.vue';
-
 	export default {
 		data() {
 			return {

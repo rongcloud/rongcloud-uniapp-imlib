@@ -32,7 +32,7 @@ import {
 	getRemoteHistoryMessages,
 	cleanRemoteHistoryMessages,
 	cleanHistoryMessages
-} from "../../dist"
+} from "@rongcloud/imlib-uni"
 import {addSuccessResult, addErrorResult, addPrimaryResult} from '../util/common.js'
 import config from '../config/config.js'
 import _global from '../config/global.js'
