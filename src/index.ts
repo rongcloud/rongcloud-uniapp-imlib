@@ -42,8 +42,6 @@ import {
 const RCIMClient = uni.requireNativePlugin('RCUniIM')
 
 export * from './types'
-
-const eventEmitter: any = {}
 /**
  * 初始化 SDK，只需要调用一次  
  *
