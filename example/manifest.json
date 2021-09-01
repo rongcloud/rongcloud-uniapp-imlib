@@ -61,6 +61,20 @@
                     "pid" : "",
                     "parameters" : {}
                 }
+            },
+            "RCUniIM" : {
+                "__plugin_info__" : {
+                    "name" : "RCUniIM",
+                    "description" : "RCUniIM插件",
+                    "platforms" : "Android",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
+                    "parameters" : {}
+                }
             }
         }
     },

@@ -64,7 +64,7 @@
 			>
 				<scroll-view scroll-y="true" style="height: 70vh;">
 					<view  v-if="curFormVisible">
-						<view class="" v-for="(item, index) in curFormInfo.params" style="margin-bottom: 10px;">
+						<view class="" v-for="(item, index) in curFormInfo.params" :key="item.key" style="margin-bottom: 10px;">
 							<view class="">
 								{{item.name || item.key}}:
 							</view>
@@ -79,7 +79,6 @@
 								<textarea v-model="item.value" :placeholder="'请输入' + item.key" style="border: 1px solid #999999;padding: 3px"/>
 							</view>
 							<view class="" v-else-if="item.type === 'picker'">
-								<!-- 目前一个表单中picker仅支持一个 -->
 								<picker @change="(e) => {bindPickerChange(e, item.key)}" :value="item.valueIndex" :range="item.list" range-key="label">
 									<view class="uni-input" style="background-color: #C0C0C0;">{{item.list[item.valueIndex].label}}</view>
 								</picker>

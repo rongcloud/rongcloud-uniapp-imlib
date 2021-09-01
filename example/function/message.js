@@ -86,9 +86,9 @@ export const _sendMessage = {
 			pushData: pushData,
 			
 		}
-		if (mentionedType !== 0) {
+		if (mentionedType != 0) {
 			msg.content.mentionedInfo = {
-				type: mentionedType,
+				type: parseInt(mentionedType),
 				userIdList: userIdList,
 				mentionedContent: mentionedContent,
 			}
@@ -706,15 +706,15 @@ export const _deleteMessages = {
 export const _deleteMessagesByIds = {
 	name: "根据消息 ID 删除消息",
 	before: function() {
-		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : 0
+		this.params[0].value = _global.lastSendMsg ? _global.lastSendMsg.messageId : '0'
 	},
 	params: [
-		{ key: 'messageId', value: 0, type: 'number', name: '消息Id，多个以,隔开'},
+		{ key: 'messageId', value: '0', type: 'string', name: '消息Id，多个以,隔开'},
 	],
 	action: function({messageId}) {
 		console.log('调用deleteMessagesByIds方法')
 		deleteMessagesByIds(
-			messageId.split(',').map(i => parseInt(i)),
+			messageId.toString().split(',').map(i => parseInt(i)),
 			(res) => {
 				console.log(JSON.stringify(res))
 				addPrimaryResult({
