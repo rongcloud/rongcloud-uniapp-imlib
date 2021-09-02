@@ -51,7 +51,7 @@ module.exports = [
     input,
     output: [
       { file: resolve(pkg.main), format: 'cjs', banner },
-      // { file: resolve(pkg.module), format: 'esm', banner }
+      { file: resolve(pkg.module), format: 'esm', banner }
     ],
     plugins
   },
