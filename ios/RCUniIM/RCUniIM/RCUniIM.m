@@ -912,7 +912,7 @@ UNI_EXPORT_METHOD(@selector(getCurrentUserId:));//done
 
 UNI_EXPORT_METHOD(@selector(setPushContentShowStatus:callback:));//done
 - (void)setPushContentShowStatus:(BOOL)status callback:(UniModuleKeepAliveCallback)callback {
-    [RCCoreClient.sharedCoreClient.pushProfile setPushReceiveStatus:status success:^{
+    [RCCoreClient.sharedCoreClient.pushProfile updateShowPushContentStatus:status success:^{
             if(callback) {
                 callback(@{@"code":@(0)},NO);
             }
@@ -926,7 +926,7 @@ UNI_EXPORT_METHOD(@selector(setPushContentShowStatus:callback:));//done
 UNI_EXPORT_METHOD(@selector(getPushContentShowStatus:));//done
 - (void)getPushContentShowStatus:(UniModuleKeepAliveCallback)callback {
     BOOL ret = RCCoreClient.sharedCoreClient.pushProfile.isShowPushContent;
-    int code = ret ? 0 : -1;
+    int code = 0;
     if(callback) {
         callback(@{@"code":@(code),@"status":@(ret)},NO);
     }

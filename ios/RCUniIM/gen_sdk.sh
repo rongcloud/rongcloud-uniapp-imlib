@@ -27,7 +27,32 @@ echo "编译真机开始 ${targetName}"
 xcodebuild -project ${PROJECT_NAME} -target "$targetName" -configuration $CONFIGURATION  -sdk $TARGET_DECIVE build
 echo "编译真机结束 ${targetName}"
 
-
+echo "copy xcframework start"
 cp -af framework/*.xcframework bin/
+echo "copy xcframework end"
 
+cd bin/
+
+# 将 xcframework 转为 framework
+# uniapp 不支持 xcframework 动态库，仅支持 framework 动态库
+function lipo_create(){
+    TARGET_NAME=$1
+    echo
+    echo "${TARGET_NAME}.xcframework > ${TARGET_NAME}.framework"
+    cp -af ${TARGET_NAME}.xcframework/ios-arm*/${TARGET_NAME}.framework ${TARGET_NAME}.framework
+
+    lipo -create ${TARGET_NAME}.xcframework/ios*/${TARGET_NAME}.framework/${TARGET_NAME} -output ${TARGET_NAME}.framework/${TARGET_NAME}
+}
+
+lipo_create RongChatRoom
+lipo_create RongIMLibCore
+
+echo
+file RongChatRoom.framework/RongChatRoom
+
+echo
+file RongIMLibCore.framework/RongIMLibCore
+
+rm -rf *.xcframework
+echo
 echo "Uni-app SDK 已生成在 bin/ 中"
