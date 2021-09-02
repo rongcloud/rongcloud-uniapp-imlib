@@ -5,7 +5,7 @@ const runshell = (command, cwd) => {
 }
 
 const pkg = require('../package.json')
-// const commitId = execSync('git rev-parse HEAD').toString().replace(/\s/g, '')
+const commitId = execSync('git rev-parse HEAD').toString().replace(/\s/g, '')
 
 const npmRelease = 'release/npm'
 
@@ -29,7 +29,7 @@ module.exports = (compiler) => {
     delete pkg.private
     delete pkg.devDependencies
     delete pkg.scripts
-    // pkg.__commit__ = commitId
+    pkg.__commit__ = commitId
 
     // 覆盖 README.md
     runshell(`cp -r INTRODUCTION.md ${npmRelease}/README.md`)

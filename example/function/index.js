@@ -83,21 +83,22 @@ import {
 	_setPushConfig
 } from './other.js'
 
-import { setTestConfig } from './testConfig.js'
+import { setTestConfig, _InitNativePlugin } from './testConfig.js'
 
 export default [
 	{
 		title: '配置',
 		list: [
 			setTestConfig,
+			_InitNativePlugin
 			// clearTestConfig
 		]
 	},
 	{
 		title: '基础接口',
 		list: [
-			_InitListener,
 			_Init,
+			_InitListener,
 			_Connect,
 			_Disconnect,
 			// _SetDeviceToken,

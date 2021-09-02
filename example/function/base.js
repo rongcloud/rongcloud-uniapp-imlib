@@ -12,7 +12,6 @@ import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } fro
 import config from '../config/config.js'
 import initListener from './listener.js'
 
-
 export const _InitListener = {
 	name: "添加事件监听",
 	action: function() {
@@ -27,13 +26,15 @@ export const _InitListener = {
 export const _Init = {
 	name: "初始化",
 	action: function() {
+		
+		console.log('调用初始化方法')
+		console.log(config.appkey)
+		init(config.appkey)
+		
 		if (config.navi) {
 			console.log('调用setServerInfo方法')
 			setServerInfo(config.navi)			
 		}
-		console.log('调用初始化方法')
-		console.log(config.appkey)
-		init(config.appkey)
 		
 		addSuccessResult({
 			title: '调用初始化接口',

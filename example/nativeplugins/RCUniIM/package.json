@@ -15,6 +15,21 @@
 			],
 			"integrateType": "aar",
 			"minSdkVersion" : 16
-		}
+		},
+		"ios": {
+		      "plugins": [
+		        {
+		          "type": "module",
+		          "name": "RCUniIM",
+		          "class": "RCUniIM"
+		        }
+		      ],
+		      "frameworks": [
+		        "RongChatRoom.framework",
+		        "RongIMLibCore.framework"
+		      ],
+		      "integrateType": "framework",
+		      "deploymentTarget": "9.0"
+		    }
 	}
 }

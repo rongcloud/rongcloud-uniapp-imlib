@@ -39,9 +39,10 @@ import {
   ProgressMessageResult
 } from './types'
 
-const RCIMClient = uni.requireNativePlugin('RCUniIM')
+let RCIMClient = uni.requireNativePlugin('__RC_UNI_IM__')
 
 export * from './types'
+
 /**
  * 初始化 SDK，只需要调用一次  
  *
@@ -198,25 +199,28 @@ export function getConnectionStatus (callback: (result: {status: ConnectionStatu
 
 const RCSendMessageEventMap: {[key: string]: SentProgressMessageCallback} = {}
 
-RCIMClient.addEventListener('rcimlib-send-message', (res: UniListenerResult<ProgressMessageResult>) => {
-  const data = res.data
-  const callback = RCSendMessageEventMap[data.eventId]
-  if (callback) {
-      const { success, error, cancel, progress } = callback
-      if (data.type === ResponseType.SUCCESS) {
-        success && success(data.messageId)
-        delete RCSendMessageEventMap[data.eventId]
-      } else if (data.type === ResponseType.ERROR) {
-        error && error(data.errorCode, data.messageId)
-        delete RCSendMessageEventMap[data.eventId]
-      } else if (data.type === ResponseType.CANCEL) {
-        cancel && cancel(data.messageId)
-        delete RCSendMessageEventMap[data.eventId]
-      } else if (data.type === ResponseType.PROGRESS) {
-        progress && progress(data.progress, data.messageId)
-      }
-  }
-})
+let isInitSendMediaMessage = false
+const initSendMediaMessage = function () {
+  RCIMClient.addEventListener('rcimlib-send-message', (res: UniListenerResult<ProgressMessageResult>) => {
+    const data = res.data
+    const callback = RCSendMessageEventMap[data.eventId]
+    if (callback) {
+        const { success, error, cancel, progress } = callback
+        if (data.type === ResponseType.SUCCESS) {
+          success && success(data.messageId)
+          delete RCSendMessageEventMap[data.eventId]
+        } else if (data.type === ResponseType.ERROR) {
+          error && error(data.errorCode, data.messageId)
+          delete RCSendMessageEventMap[data.eventId]
+        } else if (data.type === ResponseType.CANCEL) {
+          cancel && cancel(data.messageId)
+          delete RCSendMessageEventMap[data.eventId]
+        } else if (data.type === ResponseType.PROGRESS) {
+          progress && progress(data.progress, data.messageId)
+        }
+    }
+  })
+}
 
 function handleSendMessageCallback (callback: SentProgressMessageCallback): string {
   const eventId = Date.now() + Math.floor((Math.random()*100000)).toString()
@@ -232,6 +236,10 @@ function handleSendMessageCallback (callback: SentProgressMessageCallback): stri
  * @param callback 回调函数
  */
 export function sendMessage (message: SentMessage, callback: (result: SendMessageResult) => {}) {
+  if (!isInitSendMediaMessage) {
+    initSendMediaMessage()
+    isInitSendMediaMessage = true
+  }
   RCIMClient.sendMessage(message, callback)
 }
 
@@ -364,7 +372,6 @@ export function sendReadReceiptResponse (
   messages: Message[],
   callback: (result: BaseResult) => void
 ) {
-  console.log(JSON.stringify(arguments))
   RCIMClient.sendReadReceiptResponse(conversationType, targetId, messages, callback)
 }
 
@@ -423,25 +430,28 @@ export interface MediaMessageCallback {
 
 const RCDownMessageEventMap: {[key: string]: MediaMessageCallback} = {}
 
-RCIMClient.addEventListener('rcimlib-download-media-message', (res: any) => {
-  console.log('下载媒体消息回调', res.data.eventId)
-  const data = res.data
-  const callback = RCDownMessageEventMap[data.eventId]
-  if (callback) {
-      const { success, error, cancel, progress } = callback
-      if (data.type === 'success') {
-        success && success(data.path)
-        delete RCDownMessageEventMap[data.eventId]
-      } else if (data.type === 'error') {
-        error && error(data.errorCode)
-        delete RCDownMessageEventMap[data.eventId]
-      } else if (data.type === 'progress') {
-        progress && progress(data.progress)
-      } else if (data.type === 'cancel') {
-        cancel && cancel()
-      }
-  }
-})
+let isInitDownMediaListener = false
+const initDownMediaListener = function () {
+  RCIMClient.addEventListener('rcimlib-download-media-message', (res: any) => {
+    console.log('下载媒体消息回调', res.data.eventId)
+    const data = res.data
+    const callback = RCDownMessageEventMap[data.eventId]
+    if (callback) {
+        const { success, error, cancel, progress } = callback
+        if (data.type === 'success') {
+          success && success(data.path)
+          delete RCDownMessageEventMap[data.eventId]
+        } else if (data.type === 'error') {
+          error && error(data.errorCode)
+          delete RCDownMessageEventMap[data.eventId]
+        } else if (data.type === 'progress') {
+          progress && progress(data.progress)
+        } else if (data.type === 'cancel') {
+          cancel && cancel()
+        }
+    }
+  })
+}
 
 function handleDownMessageCallback (callback: MediaMessageCallback): string {
   const eventId = Date.now() + Math.floor((Math.random()*100000)).toString()
@@ -458,6 +468,10 @@ function handleDownMessageCallback (callback: MediaMessageCallback): string {
  * @param callback 回调
  */
 export function downloadMediaMessage (messageId: number, callback: MediaMessageCallback = {}) {
+  if (!isInitDownMediaListener) {
+    initDownMediaListener()
+    isInitDownMediaListener = true
+  }
   RCIMClient.downloadMediaMessage(messageId, handleDownMessageCallback(callback))
 }
 

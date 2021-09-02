@@ -1,11 +1,11 @@
 const path = require('path')
-// const { execSync } = require('child_process')
+const { execSync } = require('child_process')
 const replace = require('@rollup/plugin-replace')
 const { default: dts } = require('rollup-plugin-dts')
 const del = require('rollup-plugin-delete')
 const rollupTs = require('@rollup/plugin-typescript')
 
-// const commitId = execSync('git rev-parse HEAD').toString().replace(/\s/g, '')
+const commitId = execSync('git rev-parse HEAD').toString().replace(/\s/g, '')
 
 const resolve = (...args) => path.resolve(__dirname, '..', ...args)
 
@@ -17,15 +17,16 @@ const input = resolve('src/index.ts')
 const banner = [
   '/*',
   ` * ${attrs.globals} - v${pkg.version}`,
-  // ` * CommitId - ${commitId}`,
+  ` * CommitId - ${commitId}`,
   ` * ${new Date()}`,
   ' * ©2020 RongCloud, Inc. All rights reserved.',
   ' */'
 ].join('\n')
 
 const consts = {
-  // __COMMIT_ID__: JSON.stringify(commitId),
-  __VERSION__: JSON.stringify(pkg.version)
+  __COMMIT_ID__: JSON.stringify(commitId),
+  __VERSION__: JSON.stringify(pkg.version),
+  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RCUniIM' : 'RCUniIM_Pre'
 }
 
 module.exports = [
@@ -38,7 +39,7 @@ module.exports = [
     plugins: [
       // delete 插件只能最初始位置执行一次
       del({ targets: 'dist/*' }),
-      // replace({ __DEV__: true, ...consts }),
+      replace({ __DEV__: true, ...consts }),
       rollupTs({ sourceMap: false, target: 'ES2016' })
     ]
   },

@@ -1,6 +1,9 @@
 // 测试基础信息配置
 import config from '../config/config.js'
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
+import {
+	initNativePlugin
+} from "@rongcloud/imlib-uni"
 
 const userList = config.userList.map(i => {
 	return {
@@ -34,6 +37,16 @@ export const setTestConfig = {
 			title: '配置成功',
 			data: config
 		})
+	}
+}
+
+export const _InitNativePlugin = {
+	name: "选择运行环境",
+	params: [
+		{ key: 'isEnterprise', value: false, type: 'boolean', name: '私有云'},
+	],
+	action: function({isEnterprise}) {
+		initNativePlugin(isEnterprise)
 	}
 }
 

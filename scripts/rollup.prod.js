@@ -31,6 +31,7 @@ const banner = [
 const consts = {
   __COMMIT_ID__: JSON.stringify(commitId),
   __VERSION__: JSON.stringify(pkg.version),
+  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RCUniIM' : 'RCUniIM_Pre'
 }
 
 const plugins = [
@@ -42,15 +43,15 @@ const plugins = [
   nodeResolve({ extensions, modulesOnly: true, resolveOnly: ['core-js'] }),
   babel({ exclude: 'node_modules/**', extensions, comments: false, babelHelpers: 'bundled' })
 ]
-const isRelease = /^(\d+\.){2}\d+$/.test(pkg.version)
-isRelease && plugins.push(terser())
+// const isRelease = /^(\d+\.){2}\d+$/.test(pkg.version)
+// isRelease && plugins.push(terser())
 
 module.exports = [
   {
     input,
     output: [
       { file: resolve(pkg.main), format: 'cjs', banner },
-      { file: resolve(pkg.module), format: 'esm', banner }
+      // { file: resolve(pkg.module), format: 'esm', banner }
     ],
     plugins
   },
