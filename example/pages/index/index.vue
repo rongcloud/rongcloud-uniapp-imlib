@@ -1,5 +1,5 @@
 <template>
-	<view class="">
+	<view class="container">
 		<uni-collapse accordion>
 			<uni-collapse-item :title="item.title + '(' + item.list.length + ')'" v-for="(item, index) in functionList" :key="index">
 			    <view class="content">
@@ -173,6 +173,9 @@
 </script>
 
 <style>
+	.container {
+		padding-bottom: 80px;
+	}
 	.content {
 		padding: 10px;
 		display: flex;
