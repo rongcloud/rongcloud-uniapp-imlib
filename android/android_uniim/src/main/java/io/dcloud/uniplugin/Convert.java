@@ -2,9 +2,12 @@ package io.dcloud.uniplugin;
 
 import android.content.Context;
 import android.net.Uri;
+import android.text.TextUtils;
 
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,8 +50,12 @@ class Convert {
         map.put("senderUserId", message.getSenderUserId());
         map.put("sentTime", (double) message.getSentTime());
         map.put("receivedTime", (double) message.getReceivedTime());
-        map.put("sentStatus", message.getSentStatus().getValue());
-        map.put("receivedStatus", message.getReceivedStatus().getFlag());
+        if (message.getSentStatus() != null) {
+            map.put("sentStatus", message.getSentStatus().getValue());
+        }
+        if (message.getReceivedStatus() != null) {
+            map.put("receivedStatus", message.getReceivedStatus().getFlag());
+        }
         map.put("extra", message.getExtra());
         map.put("objectName", message.getObjectName());
         String objectName = message.getObjectName();
@@ -57,7 +64,11 @@ class Convert {
     }
 
     static Map<String, Object> toJSON(String objectName, MessageContent content) {
+
         Map<String, Object> map = new HashMap<>();
+        if(TextUtils.isEmpty(objectName)) {
+            return map;
+        }
         map.put("objectName", objectName);
         switch (objectName) {
             case "RC:TxtMsg":
@@ -348,8 +359,13 @@ class Convert {
         if (messageContent != null && map.containsKey("mentionedInfo")) {
             Map mentionedMap = (Map) map.get("mentionedInfo");
             if (mentionedMap != null) {
-                MentionedInfo.MentionedType type = MentionedInfo.MentionedType.valueOf((Integer) mentionedMap.get("type"));
-                ArrayList<String> userIdList = toStringList((Object[]) mentionedMap.get("userIdList"));
+                MentionedInfo.MentionedType type = MentionedInfo.MentionedType.valueOf(Integer.parseInt(String.valueOf(mentionedMap.get("type"))));
+                ArrayList<String> userIdList = new ArrayList<>();
+                if (mentionedMap.get("userIdList") instanceof Object[]) {
+                    userIdList = toStringList((Object[]) mentionedMap.get("userIdList"));
+                } else if (mentionedMap.get("userIdList") instanceof JSONArray) {
+                    userIdList = toJsonStringList((JSONArray) mentionedMap.get("userIdList"));
+                }
                 String content = mentionedMap.containsKey("mentionedContent") ?
                         (String) mentionedMap.get("mentionedContent") : null;
                 MentionedInfo mentionedInfo = new MentionedInfo(type, userIdList, content);
@@ -369,6 +385,15 @@ class Convert {
             list.add((String) o);
         }
         return list;
+    }
+
+
+    static ArrayList<String> toJsonStringList(JSONArray array) {
+        if (array == null) {
+            return null;
+        }
+        String string = JSONObject.toJSONString(array, SerializerFeature.WriteClassName);
+        return (ArrayList<String>) JSONObject.parseArray(string, String.class);
     }
 
     static String[] toStringArray(Object[] items) {
