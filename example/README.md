@@ -24,6 +24,7 @@ npm link
 ```
 npm link @rongcloud/imlib-uni
 ```
+或者直接通过 `npm install @rongcloud/imlib-uni --save ` 来安装
 
 2. 使用 Hbuilder 打开该目录
 

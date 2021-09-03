@@ -31,7 +31,7 @@ const banner = [
 const consts = {
   __COMMIT_ID__: JSON.stringify(commitId),
   __VERSION__: JSON.stringify(pkg.version),
-  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RCUniIM' : 'RCUniIM_Pre'
+  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RCUniIM' : 'RCUniIM'
 }
 
 const plugins = [

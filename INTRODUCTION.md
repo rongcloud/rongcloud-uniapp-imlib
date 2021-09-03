@@ -4,7 +4,7 @@
 
 ## 使用说明
 
-1. 在 DCloud 插件市场搜索并安装 RCUniIM。
+1. 在 DCloud 插件市场搜索并安装 RCUniIM，或者手动下载安装插件放入 nativeplugins 目录下。
 
 2. 在 manifest.json -> APP 原生插件配置 -> 加入原生插件 RCUniIM。
 
