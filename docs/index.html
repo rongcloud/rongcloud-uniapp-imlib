@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>imlib-uni</title>
-	<meta name="description" content="Documentation for imlib-uni">
+	<title>@rongcloud/imlib-uni</title>
+	<meta name="description" content="Documentation for @rongcloud/imlib-uni">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 	<script async src="assets/js/search.js" id="search-script"></script>
@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="index.html" class="title">imlib-uni</a>
+					<a href="index.html" class="title">@rongcloud/imlib-uni</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -50,7 +50,7 @@
 	</div>
 	<div class="tsd-page-title">
 		<div class="container">
-			<h1>imlib-uni</h1>
+			<h1>@rongcloud/imlib-uni</h1>
 		</div>
 	</div>
 </header>
@@ -61,6 +61,9 @@
 				<a href="#rongcloud-uniapp-imlib" id="rongcloud-uniapp-imlib" style="color: inherit; text-decoration: none;">
 					<h1>rongcloud-uniapp-imlib</h1>
 				</a>
+				<p><a href="./example/README.md">demo 测试文档</a></p>
+				<p><a href="./INTRODUCTION.md">imlib-uni 包使用文档</a></p>
+				<p>imlib-uni 接口文档: 用浏览器打开文件 ”./docs/index.html“</p>
 				<a href="#关键目录说明" id="关键目录说明" style="color: inherit; text-decoration: none;">
 					<h2>关键目录说明</h2>
 				</a>
@@ -70,6 +73,9 @@
 					<li>example/config/config.js： 连接配置信息</li>
 					<li>function: 测试接口目录</li>
 					<li>example/nativeplugins: 原生插件目录</li>
+					<li>docs: 文档</li>
+					<li>ios: iOS 端源码</li>
+					<li>android: Android 端源码</li>
 				</ol>
 				<a href="#初始化" id="初始化" style="color: inherit; text-decoration: none;">
 					<h2>初始化</h2>
@@ -81,15 +87,22 @@
 				</a>
 				<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> build:</span><span style="color: #001080">dev</span>
 </code></pre>
-				<a href="#导入原生插件" id="导入原生插件" style="color: inherit; text-decoration: none;">
-					<h2>导入原生插件</h2>
+				<a href="#打包" id="打包" style="color: inherit; text-decoration: none;">
+					<h2>打包</h2>
 				</a>
-				<ol>
-					<li>使用 hbuilder 打开 example 目录</li>
-					<li>将原生插件放入 nativeplugins 目录下</li>
-					<li>在 manifest.json 中添加本地插件配置</li>
-					<li>打自定义调试基座</li>
-				</ol>
+				<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">release</span>
+</code></pre>
+				<a href="#生成文档" id="生成文档" style="color: inherit; text-decoration: none;">
+					<h2>生成文档</h2>
+				</a>
+				<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">doc</span>
+</code></pre>
+				<a href="#手动导入原生插件文档" id="手动导入原生插件文档" style="color: inherit; text-decoration: none;">
+					<h1>手动导入原生插件文档</h1>
+				</a>
+				<p><a href="%E6%89%8B%E5%8A%A8%E5%AF%BC%E5%85%A5.md">使用 HBuilder X 导入原生插件</a></p>
+				<p><a href="android/android_uniim/README.md">使用 Android Studio 导入安卓原生插件</a></p>
+				<p><a href="ios/RCUniIM/%E6%89%8B%E5%8A%A8%E5%AF%BC%E5%85%A5.md">使用 Xcode 导入 ios 原生插件</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
