@@ -4,6 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
+    "@rongcloud/imlib-uni": "^5.1.3-release.1"
   },
   "devDependencies": {},
   "scripts": {
