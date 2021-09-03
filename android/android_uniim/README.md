@@ -4,7 +4,7 @@
 
 ### 1. 导入 Module
 
-* 第一步 下载 uniapp 原生 SDK ： [下载地址](https://nativesupport.dcloud.net.cn/NativePlugin/course/android)
+* 第一步 下载 uniapp 原生 SDK ：[下载地址](https://nativesupport.dcloud.net.cn/NativePlugin/course/android)
 
 下载融云原生插件
 
@@ -16,17 +16,22 @@
 
 打开 SDK 中的 HBuilder-Hello 项目
 
-* 第二步 打开工程， File -> New -> Import Module。 找到下载的 Module 组件导入。
-在主工程的 build.gradle 文件中配置 Module, 如下:
+* 第二步 
 
-```
-dependencies {
-    ...
-    api project(':android_uniim')
-    ...
-}
-
-```
+ 可以采用两种方式导入 sdk ，分别如下所示：
+ 
+ 1. 将第二步下载的 `uniapp sdk` 复制到 `UniPlugin-Hello-AS` 下 `libs`
+ 目录下（im_chatroom-5.1.3.aar，im_libcore-5.1.3.aar， gson-2.8.6.jar，RCUniIM.aar）
+ 
+ 2. 采用 `gradle` 依赖 融云 `sdk`,在 `build.gradle` 中添加依赖
+ 
+ ```
+ dependencies {
+    ......
+    api 'cn.rongcloud.sdk:im_chatroom:5.1.3'
+ }
+ 此时只需要下载 `RCUniIM.aar`，放在 `UniPlugin-Hello-AS` 下 `libs` 目录下。
+ ```
 
 * 第三步 参考 [Uniapp 配置工程](https://nativesupport.dcloud.net.cn/AppDocs/usesdk/android) 检查各项配置，特别注意 `appkey` `appid` 配置
 
