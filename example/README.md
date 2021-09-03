@@ -1,30 +1,12 @@
 # 开发测试说明
 
-## IMLib-uni 项目
-
-1. 安装依赖
-```
-npm install
-```
-
-2. 编译
-```
-npm run build:dev
-```
-
-3. 创建 npm 包软链
-```
-npm link
-```
-
 ## example 项目
 
 ### 开发环境初始化
-1. imlib-uni 包软链接初始化
+1. 安装依赖
 ```
-npm link @rongcloud/imlib-uni
+npm install @rongcloud/imlib-uni --save
 ```
-或者直接通过 `npm install @rongcloud/imlib-uni --save ` 来安装
 
 2. 使用 Hbuilder 打开该目录
 
