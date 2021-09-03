@@ -236,10 +236,6 @@ function handleSendMessageCallback (callback: SentProgressMessageCallback): stri
  * @param callback 回调函数
  */
 export function sendMessage (message: SentMessage, callback: (result: SendMessageResult) => {}) {
-  if (!isInitSendMediaMessage) {
-    initSendMediaMessage()
-    isInitSendMediaMessage = true
-  }
   RCIMClient.sendMessage(message, callback)
 }
 
@@ -250,6 +246,10 @@ export function sendMessage (message: SentMessage, callback: (result: SendMessag
  * @param callback 回调函数
  */
 export function sendMediaMessage (message: SentMessage, callback: SentProgressMessageCallback = {}) {
+  if (!isInitSendMediaMessage) {
+    initSendMediaMessage()
+    isInitSendMediaMessage = true
+  }
   RCIMClient.sendMediaMessage(message, handleSendMessageCallback(callback))
 }
 

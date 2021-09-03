@@ -40,15 +40,6 @@ export const setTestConfig = {
 	}
 }
 
-export const _InitNativePlugin = {
-	name: "选择运行环境",
-	params: [
-		{ key: 'isEnterprise', value: false, type: 'boolean', name: '私有云'},
-	],
-	action: function({isEnterprise}) {
-		initNativePlugin(isEnterprise)
-	}
-}
 
 // export const clearTestConfig = {
 // 	name: '清空配置缓存',

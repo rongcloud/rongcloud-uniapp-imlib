@@ -32,6 +32,7 @@ import {
  } from './conversation.js'
 import {
 	_sendMessage,
+	_sendChatroomMessage,
 	_sendMediaMessage,
 	_sendDirectionalMessage,
 	_recallMessage,
@@ -83,14 +84,13 @@ import {
 	_setPushConfig
 } from './other.js'
 
-import { setTestConfig, _InitNativePlugin } from './testConfig.js'
+import { setTestConfig } from './testConfig.js'
 
 export default [
 	{
 		title: '配置',
 		list: [
 			setTestConfig,
-			_InitNativePlugin
 			// clearTestConfig
 		]
 	},
@@ -135,6 +135,7 @@ export default [
 		title: '消息接口',
 		list: [
 			_sendMessage,
+			_sendChatroomMessage,
 			_sendMediaMessage,
 			_sendDirectionalMessage,
 			_recallMessage,

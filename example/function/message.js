@@ -114,6 +114,53 @@ export const _sendMessage = {
 		)
 	}
 }
+
+export const _sendChatroomMessage = {
+	name: "发送聊天室消息",
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: '', valueIndex: 0, type: 'string', name: '会话id'},
+		{ key: 'objectName', value: 'RC:TxtMsg', type: 'string'},
+		{ key: 'content', value: 'content info', type: 'string', name: '消息内容'},
+	],
+	action: function({
+		conversationType,
+		targetId,
+		objectName,
+		content
+	}) {
+		const msg = {
+			conversationType: conversationType,
+			targetId: targetId,
+			content: {
+				objectName: objectName,
+				content: content,
+			}
+			
+		}
+		console.log('调用sendMessage方法', JSON.stringify(msg))
+		sendMessage(
+			msg,
+			(res) => {
+				console.log(JSON.stringify(res))
+				if (res.code === 0) {
+					_global.lastSendMsg = {
+						messageId: res.messageId,
+						conversationType: conversationType,
+						targetId: targetId
+					}
+				}
+				addPrimaryResult({
+					title: 'sendMessage',
+					code: res.code,
+					data: res
+				})
+			}
+		)
+	}
+}
+
+
 const lastMediaInfoUrl = ''
 export const _sendMediaMessage = {
 	name: "发送媒体消息",
