@@ -21,7 +21,7 @@
  可以采用两种方式导入 sdk ，分别如下所示：
  
  1. 将第二步下载的 `uniapp sdk` 复制到 `UniPlugin-Hello-AS` 下 `libs`
- 目录下（im_chatroom-5.1.3.aar，im_libcore-5.1.3.aar， gson-2.8.6.jar，RCUniIM.aar）
+ 目录下（im_chatroom-5.1.3.aar，im_libcore-5.1.3.aar， gson-2.8.6.jar，android_uniim-release.aar）
  
  2. 采用 `gradle` 依赖 融云 `sdk`,在 `build.gradle` 中添加依赖
  
@@ -30,7 +30,7 @@
     ......
     api 'cn.rongcloud.sdk:im_chatroom:5.1.3'
  }
- 此时只需要下载 `RCUniIM.aar`，放在 `UniPlugin-Hello-AS` 下 `libs` 目录下。
+ 此时只需要下载 `android_uniim-release.aar`，放在 `UniPlugin-Hello-AS` 下 `libs` 目录下。
  ```
 
 * 第三步 参考 [Uniapp 配置工程](https://nativesupport.dcloud.net.cn/AppDocs/usesdk/android) 检查各项配置，特别注意 `appkey` `appid` 配置
