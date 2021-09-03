@@ -6,6 +6,14 @@
 
 * 第一步 下载 uniapp 原生 SDK ： [下载地址](https://nativesupport.dcloud.net.cn/NativePlugin/course/android)
 
+下载融云原生插件
+
+[公有云插件下载地址](https://downloads.rongcloud.cn/RongCloud_uniapp_IMLib_5.1.3.zip)
+
+[私有云插件下载地址](https://downloads.rongcloud.cn/RongCloud_uniapp_IMLib_Private_5.1.3.zip)
+
+注：如果使用私有云 SDK 需要联系融云的商务询问私有云相关事宜
+
 打开 SDK 中的 HBuilder-Hello 项目
 
 * 第二步 打开工程， File -> New -> Import Module。 找到下载的 Module 组件导入。
