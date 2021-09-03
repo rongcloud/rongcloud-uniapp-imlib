@@ -33,3 +33,11 @@ npm run release
 ```
 npm run doc
 ```
+
+# 手动导入原生插件文档
+
+[使用 HBuilder X 导入原生插件](手动导入.md)
+
+[使用 Android Studio 导入安卓原生插件](android/android_uniim/README.md)
+
+[使用 Xcode 导入 ios 原生插件](ios/RCUniIM/手动导入.md)

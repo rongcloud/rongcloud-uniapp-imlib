@@ -20,26 +20,20 @@ dependencies {
 
 ```
 
+* 第三步 参考 [Uniapp 配置工程](https://nativesupport.dcloud.net.cn/AppDocs/usesdk/android) 检查各项配置，特别注意 `appkey` `appid` 配置
 
-### 2. 导入 jar
 
-### 前提
-
-参考 [sdk集成方式](https://docs.rongcloud.cn/v4/views/im/ui/guide/quick/include/android.html) 方式集成 融云 IM
-
-1. 通过下面生成 `jar` 包的方式生成对应的 `jar`
-
-2. 添加 jar 到项目工程 `libs` 目录
-
-## 生成 jar
+### 生成 aar 、jar 方法
 
 执行
 
 ```
-./gradlew uniplugin_module:build -x lint
-./gradlew uniplugin_module:makeJar
+./gradlew android_uniim:build -x lint  // 生成 aar
+./gradlew android_uniim:makeJar   // 生成 jar
 ```
-完毕之后，`jar` 在 `build/libs/` 目录，生成 `Rong_UniApp.jar`
+完毕之后，
+`aar` 在 `build/outputs` 目录，生成 `android_uniim-debug.aar` `android_uniim-release.aar` 
+`jar` 在 `build/libs/` 目录，生成 `Rong_UniApp.jar`
 
 在项目 `build.gradle` 中定义：
 ```
@@ -49,5 +43,5 @@ def JAR_NAME = "Rong_UniApp"
 def OUTPUT_PATH = "build/libs/"
 ```
 
-可自行修改名称和生成目标路径
+可自行修改 `jar` 名称和生成目标路径
 

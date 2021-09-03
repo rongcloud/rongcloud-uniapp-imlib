@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import io.dcloud.feature.uniapp.annotation.UniJSMethod;
 import io.dcloud.feature.uniapp.bridge.UniJSCallback;
@@ -1011,19 +1013,34 @@ public class RCUniIM extends UniModule {
     }
 
     @UniJSMethod()
-    public void sendReadReceiptResponse(int conversationType, String targetId, Object[] messages, UniJSCallback uniJSCallback) {
+    public void sendReadReceiptResponse(final int conversationType, final String targetId, Object[] messages, final UniJSCallback uniJSCallback) {
         if (!isValidContext()) {
             return;
         }
-        ArrayList<Message> list = new ArrayList<>();
+        final CountDownLatch countDownLatch = new CountDownLatch(messages.length);
+        final ArrayList<Message> list = new ArrayList<>();
         for (Object message : messages) {
-            Map<String, Object> map = (Map<String, Object>) message;
+            final Map<String, Object> map = (Map<String, Object>) message;
             if (map != null) {
-                list.add(toMessage(mUniSDKInstance.getContext(), map));
+                final String msgUid = (String) map.get("messageUId");
+                RongCoreClient.getInstance().getMessageByUid(msgUid, new IRongCoreCallback.ResultCallback<Message>() {
+                    @Override
+                    public void onSuccess(Message message) {
+                        list.add(message);
+                        countDownLatch.countDown();
+                        if (countDownLatch.getCount() == 0) {
+                            RongCoreClient.getInstance().sendReadReceiptResponse(
+                                    Conversation.ConversationType.setValue(conversationType), targetId, list, createOperationCallback(uniJSCallback));
+                        }
+                    }
+
+                    @Override
+                    public void onError(IRongCoreEnum.CoreErrorCode coreErrorCode) {
+                        countDownLatch.countDown();
+                    }
+                });
             }
         }
-        RongCoreClient.getInstance().sendReadReceiptResponse(
-                Conversation.ConversationType.setValue(conversationType), targetId, list, createOperationCallback(uniJSCallback));
     }
 
 
