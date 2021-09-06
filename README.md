@@ -4,7 +4,7 @@
 
 [imlib-uni 包使用文档](./INTRODUCTION.md)
 
-imlib-uni 接口文档: 用浏览器打开文件 ”./docs/index.html“
+[imlib-uni 接口文档](https://rongcloud.github.io/rongcloud-uniapp-imlib/)
 
 ## 关键目录说明
 1. src: ts代码
