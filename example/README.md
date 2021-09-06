@@ -10,7 +10,7 @@ npm install @rongcloud/imlib-uni --save
 
 2. 使用 Hbuilder 打开该目录
 
-3. 在 config/config.js 文件中 userList 里加入测试的账号
+3. 复制 config/config_example.js 为 config/config.js， 并在 userList 里加入测试的账号
 
 4. 将原生插件放到 nativeplugins 目录下
 
