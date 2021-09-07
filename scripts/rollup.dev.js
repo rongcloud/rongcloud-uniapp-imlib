@@ -26,7 +26,7 @@ const banner = [
 const consts = {
   __COMMIT_ID__: JSON.stringify(commitId),
   __VERSION__: JSON.stringify(pkg.version),
-  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RCUniIM' : 'RCUniIM' // 后续要区分公有云和私有云
+  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RongCloud-IM-RCUniIM' : 'RongCloud-IM-RCUniIM' // 后续要区分公有云和私有云
 }
 
 module.exports = [

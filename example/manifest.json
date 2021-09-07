@@ -48,25 +48,11 @@
             }
         },
         "nativePlugins" : {
-            "DCloud-RichAlert" : {
-                "__plugin_info__" : {
-                    "name" : "RichAlert",
-                    "description" : "示例插件",
-                    "platforms" : "Android,iOS",
-                    "url" : "",
-                    "android_package_name" : "",
-                    "ios_bundle_id" : "",
-                    "isCloud" : false,
-                    "bought" : -1,
-                    "pid" : "",
-                    "parameters" : {}
-                }
-            },
-            "RCUniIM" : {
+            "RongCloud-IM" : {
                 "__plugin_info__" : {
                     "name" : "RCUniIM",
-                    "description" : "RCUniIM插件",
-                    "platforms" : "Android",
+                    "description" : "融云 uni 原生插件",
+                    "platforms" : "Android,iOS",
                     "url" : "",
                     "android_package_name" : "",
                     "ios_bundle_id" : "",

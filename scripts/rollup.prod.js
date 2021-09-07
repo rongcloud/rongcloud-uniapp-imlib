@@ -31,7 +31,7 @@ const banner = [
 const consts = {
   __COMMIT_ID__: JSON.stringify(commitId),
   __VERSION__: JSON.stringify(pkg.version),
-  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RCUniIM' : 'RCUniIM'
+  __RC_UNI_IM__: /release/.test(pkg.version) ? 'RongCloud-IM-RCUniIM' : 'RongCloud-IM-RCUniIM'
 }
 
 const plugins = [
