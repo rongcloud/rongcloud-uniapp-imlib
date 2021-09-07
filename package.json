@@ -1,6 +1,6 @@
 {
   "name": "@rongcloud/imlib-uni",
-  "version": "5.1.3-release.1",
+  "version": "5.1.3-release.2",
   "description": "",
   "main": "./dist/index.js",
   "__attrs__": {
