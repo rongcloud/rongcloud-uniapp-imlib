@@ -32,7 +32,7 @@ uni 原生插件的文件组织形式如下：
 
 公有云和私有云的配置文件是固定的，参见本目录的两个模板
 
-`package.private.json` 私有云配置文件，后续发版只更新版本号
+`private.package.json` 私有云配置文件，后续发版只更新版本号
 
 
-`package.public.json` 公有云配置文件，后续发版只更新版本号
+`public.package.json` 公有云配置文件，后续发版只更新版本号
