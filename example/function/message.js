@@ -163,7 +163,7 @@ export const _sendChatroomMessage = {
 
 const lastMediaInfoUrl = ''
 export const _sendMediaMessage = {
-	name: "发送媒体消息",
+	name: "发送图片媒体消息",
 	before: function() {
 		this.params[1].list = config.targetIdList
 		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
@@ -176,7 +176,7 @@ export const _sendMediaMessage = {
 		console.log('调用sendMediaMessage方法')
 		uni.chooseImage({
 			count: 1,
-			sourceType: ['album'],
+			sourceType: ['album', 'camera'],
 			success: (res) => {
 				if (res.tempFilePaths.length < 0) return
 				uni.getImageInfo({
@@ -230,6 +230,143 @@ export const _sendMediaMessage = {
 		
 	}
 }
+
+export const _sendSightMediaMessage = {
+	name: "发送视频媒体消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
+	},
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: config.targetIdList[0].value, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
+	],
+	action: function({conversationType, targetId}) {
+		console.log('调用sendMediaMessage方法')
+		
+		uni.chooseVideo({
+			count: 1,
+			sourceType: ['album', 'camera'],
+			success: (res) => {
+				console.log(res)
+				const msg = {
+					conversationType: conversationType,
+					targetId: targetId,
+					content: {
+						objectName: 'RC:FileMsg',
+						local: res.tempFilePath,
+						duration: parseInt(res.duration)
+					}
+				}
+				
+				console.log(msg)
+				sendMediaMessage(
+					msg,
+					{
+						success: (messageId) => {
+							addSuccessResult({
+								title: 'sendMediaMessage success',
+								code: messageId,
+								data: messageId
+							})
+						},
+						  progress: (progress, messageId) => {
+							  addPrimaryResult({
+							  	title: 'sendMediaMessage progress ',
+							  	code: progress,
+							  	data: {messageId, progress}
+							  })
+						  },
+						  cancel: (messageId) => {
+							  addPrimaryResult({
+							  	title: 'sendMediaMessage cancel',
+							  	data: messageId
+							  })
+						  },
+						  error: (errorCode, messageId) => {
+							  addErrorResult({
+							  	title: 'sendMediaMessage error',
+							  	data: {messageId, errorCode}
+							  })
+						  }
+					}
+				)
+				return
+				
+			}
+		})
+		
+	}
+}
+
+export const _sendVoiceMessage = {
+	name: "发送音频媒体消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
+	},
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: null, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
+	],
+	action: function({
+		conversationType,
+		targetId,
+	}) {
+		const recorderManager = uni.getRecorderManager()
+		recorderManager.onStop(function(res) {
+			const msg = {
+				conversationType: conversationType,
+				targetId: targetId,
+				content: {
+					objectName: 'RC:HQVCMsg',
+					local: 'file:///' + plus.io.convertLocalFileSystemURL(res.tempFilePath),
+					duration: 2
+				}
+			}
+			
+			console.log(msg)
+			sendMediaMessage(
+				msg,
+				{
+					success: (messageId) => {
+						addSuccessResult({
+							title: 'sendMediaMessage success',
+							code: messageId,
+							data: messageId
+						})
+					},
+					  progress: (progress, messageId) => {
+						  addPrimaryResult({
+						  	title: 'sendMediaMessage progress ',
+						  	code: progress,
+						  	data: {messageId, progress}
+						  })
+					  },
+					  cancel: (messageId) => {
+						  addPrimaryResult({
+						  	title: 'sendMediaMessage cancel',
+						  	data: messageId
+						  })
+					  },
+					  error: (errorCode, messageId) => {
+						  addErrorResult({
+						  	title: 'sendMediaMessage error',
+						  	data: {messageId, errorCode}
+						  })
+					  }
+				}
+			)
+		})	
+		recorderManager.onError(function(error) {
+			console.log('error:', JSON.stringify(error))
+		})
+		recorderManager.start({
+			duration: 1000
+		})
+	}
+}
+
 
 export const _sendDirectionalMessage = {
 	name: "发送定向消息",
