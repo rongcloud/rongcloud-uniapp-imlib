@@ -48,7 +48,7 @@ UNI_EXPORT_METHOD_SYNC(@selector(init:));
     }];
 }
 
-UNI_EXPORT_METHOD(@selector(connect:callback:));//done
+UNI_EXPORT_METHOD_SYNC(@selector(connect:callback:));//done
 - (void)connect:(NSString *)token callback:(UniModuleKeepAliveCallback)callback {
     [self asyncProcessInMainThread:^{
         [[RCCoreClient sharedCoreClient] connectWithToken:token dbOpened:^(RCDBErrorCode code) {
