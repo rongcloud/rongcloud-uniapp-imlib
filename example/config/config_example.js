@@ -5,7 +5,9 @@ const userList = [
 	// {
 		// appkey: 'appkey',
 		// 	userId: 'user001',
-		// 	token: '填入token'
+		// 	token: '填入token',
+    // 	navi: 'naviUrl', // 非必填
+	  // 	file: 'fileUrl'  // 非必填
 	// }
 ]
 
