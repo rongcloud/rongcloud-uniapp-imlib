@@ -266,7 +266,6 @@ export interface LocationMessage extends MessageContent {
  */
 export interface VoiceMessage extends MessageContent {
   objectName: ObjectName.Voice;
-  data: string;
   local: string;
   duration: number;
 }
