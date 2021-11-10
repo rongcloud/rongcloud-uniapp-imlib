@@ -500,7 +500,7 @@ export function setReconnectKickEnable (enabled: boolean) {
  *
  * @param conversationType 会话类型
  * @param targetId 目标 ID
- * @param objectName 消息对象名称，可以用 MessageObjectNames 获取消息类型对应的对象名称
+ * @param objectName 消息对象名称，可以用 MessageObjectNames 获取消息类型对应的对象名称, 传空字符串获取所有类型
  * @param baseMessageId 最近一条消息的 ID
  * @param count 数量
  * @param isForward 是否向前获取

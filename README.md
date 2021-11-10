@@ -43,7 +43,3 @@ npm run doc
 [使用 Android Studio 导入安卓原生插件](android/android_uniim/README.md)
 
 [使用 Xcode 导入 ios 原生插件](ios/RCUniIM/手动导入.md)
-
-# 私有云
-
-请参考[私有云文档](PrivateCloud.md)
