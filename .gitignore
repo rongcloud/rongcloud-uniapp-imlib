@@ -3,3 +3,7 @@ node_modules
 dist
 build
 release
+android/android_uniim/.gradle/
+android/android_uniim/.settings/
+android/android_uniim/.project
+example/.hbuilderx/

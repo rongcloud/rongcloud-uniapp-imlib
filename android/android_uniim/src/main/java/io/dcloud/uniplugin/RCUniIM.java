@@ -56,6 +56,10 @@ public class RCUniIM extends UniModule {
     @UniJSMethod()
     public void init(String appKey) {
         if (isValidContext()) {
+            List<Class<? extends MessageContent>> messageTypeList = new LinkedList<>();
+            messageTypeList.add(SightMessage.class);
+            RongCoreClient.registerMessageType(messageTypeList);
+            
             RongCoreClient.init(mUniSDKInstance.getContext(), appKey);
         }
 
