@@ -7,14 +7,14 @@
 [imlib-uni 接口文档](https://rongcloud.github.io/rongcloud-uniapp-imlib/)
 
 ## 关键目录说明
-1. src: ts代码
-2. example: uniapp 测试demo
-3. example/config/config.js： 连接配置信息
-4. function: 测试接口目录
-5. example/nativeplugins: 原生插件目录
-6. docs: 文档
-7. ios: iOS 端源码
-8. android: Android 端源码
+
+.
+├── README.md
+├── android                 // Android 端源码
+├── docs                    // 文档
+├── example                 // uniapp 测试 Demo
+├── ios                     // iOS 端源码
+└── src                     // TS 接口文件
 
 ## 初始化
 ```
@@ -37,8 +37,6 @@ npm run doc
 ```
 
 # 手动导入原生插件文档
-
-[使用 HBuilder X 导入原生插件](手动导入.md)
 
 [使用 Android Studio 导入安卓原生插件](android/android_uniim/README.md)
 

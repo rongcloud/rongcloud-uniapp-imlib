@@ -176,7 +176,7 @@ export const _sendMediaMessage = {
 		console.log('调用sendMediaMessage方法')
 		uni.chooseImage({
 			count: 1,
-			sourceType: ['album', 'camera'],
+			sourceType: ['album'],
 			success: (res) => {
 				if (res.tempFilePaths.length < 0) return
 				uni.getImageInfo({
@@ -254,7 +254,7 @@ export const _sendSightMediaMessage = {
 					targetId: targetId,
 					content: {
 						objectName: 'RC:FileMsg',
-						local: res.tempFilePath,
+						local: plus.io.convertLocalFileSystemURL(res.tempFilePath),
 						duration: parseInt(res.duration)
 					}
 				}

@@ -1,0 +1,38 @@
+{
+	"name": "RCUniIM",
+	"id": "RongCloud-IM",
+	"version": "5.1.3-4",
+	"description": "融云 uni 原生插件",
+	"_dp_type":"nativeplugin",
+	"_dp_nativeplugin":{
+		"android": {
+			"plugins": [
+				{
+					"type": "module",
+					"name": "RongCloud-IM-RCUniIM",
+					"class": "io.dcloud.uniplugin.RCUniIM"
+				}
+			],
+			"dependencies": [
+			  "cn.rongcloud.sdk:im_lib:5.1.3"
+			],
+			"integrateType": "aar",
+			"minSdkVersion" : 19
+		},
+		"ios": {
+		      "plugins": [
+		        {
+		          "type": "module",
+		          "name": "RongCloud-IM-RCUniIM",
+		          "class": "RCUniIM"
+		        }
+		      ],
+		      "frameworks": [
+		        "RongChatRoom.framework",
+		        "RongIMLibCore.framework"
+		      ],
+		      "integrateType": "framework",
+		      "deploymentTarget": "9"
+		    }
+	}
+}

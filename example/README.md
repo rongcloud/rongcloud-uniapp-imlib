@@ -10,12 +10,8 @@ npm install @rongcloud/imlib-uni --save
 
 2. 使用 Hbuilder 打开该目录
 
-3. 复制 config/config_example.js 为 config/config.js， 并在 userList 里加入测试的账号
+3. 修改 config.js 中的配置信息
 
-4. 将原生插件放到 nativeplugins 目录下
+4. 运行 -> 运行到手机 -> 制作自定义调试基座
 
-5. 在 manifest.json -> APP 原生插件配置 -> 本地插件中加入原生插件
-
-6. 运行 -> 运行到手机 -> 制作自定义调试基座
-
-7. 运行 -> 运行到手机 -> 运行基座选择 -> 选择自定义基座
+5. 运行 -> 运行到手机 -> 运行基座选择 -> 选择自定义基座
