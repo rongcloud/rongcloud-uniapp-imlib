@@ -11,8 +11,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
+import cn.rongcloud.imlib.iw.RCIMIWEngine;
+import cn.rongcloud.imlib.iw.confg.RCIMIWEngineSetup;
+import cn.rongcloud.imlib.iw.message.RCCommandMessage;
+import cn.rongcloud.imlib.iw.message.RCNormalMessage;
+import cn.rongcloud.imlib.iw.message.RCStatusMessage;
+import cn.rongcloud.imlib.iw.message.RCStorageMessage;
 import io.dcloud.feature.uniapp.annotation.UniJSMethod;
 import io.dcloud.feature.uniapp.bridge.UniJSCallback;
 import io.dcloud.feature.uniapp.common.UniModule;
@@ -57,8 +62,38 @@ public class RCUniIM extends UniModule {
     public void init(String appKey) {
         if (isValidContext()) {
             RongCoreClient.init(mUniSDKInstance.getContext(), appKey);
-        }
 
+            List<Class<? extends MessageContent>> customMessageList = new ArrayList<>();
+            customMessageList.add(RCCommandMessage.class);
+            customMessageList.add(RCStorageMessage.class);
+            customMessageList.add(RCNormalMessage.class);
+            customMessageList.add(RCStatusMessage.class);
+
+            RongCoreClient.registerMessageType(customMessageList);
+
+            registerEventListener();
+        }
+    }
+
+    @UniJSMethod()
+    public void initWithSetup(String appKey, Map<String, Object> engineSetup) {
+        if (isValidContext()) {
+            RCIMIWEngineSetup setup = Convert.toEngineSetup(engineSetup);
+            RCIMIWEngine.init(mUniSDKInstance.getContext(), appKey, setup);
+
+            List<Class<? extends MessageContent>> customMessageList = new ArrayList<>();
+            customMessageList.add(RCCommandMessage.class);
+            customMessageList.add(RCStorageMessage.class);
+            customMessageList.add(RCNormalMessage.class);
+            customMessageList.add(RCStatusMessage.class);
+
+            RongCoreClient.registerMessageType(customMessageList);
+
+            registerEventListener();
+        }
+    }
+
+    private void registerEventListener() {
         RongCoreClient.setConnectionStatusListener(new IRongCoreListener.ConnectionStatusListener() {
             @Override
             public void onChanged(ConnectionStatus connectionStatus) {

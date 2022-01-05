@@ -115,6 +115,64 @@ export const _sendMessage = {
 	}
 }
 
+export const _sendCustomMessage = {
+	name: "发送自定义消息",
+	before: function() {
+		this.params[1].list = config.targetIdList
+		if (!this.params[1].value) {this.params[1].value = config.targetIdList[0].value}
+	},
+	params: [
+		{ key: 'conversationType', value: config.conversationType, type: 'number', name: '会话类型'},
+		{ key: 'targetId', value: null, valueIndex: 0, type: 'picker', name: '会话id', list: config.targetIdList},
+		{ key: 'customType', value: 3, type: 'number', name: '自定义消息类型：0 命令 1 存储 2 存储计数 3 状态消息'},
+		{ key: 'objectName', value: 'Cust:TxtMsg', type: 'string'},
+		{ key: 'customFields', value: '{ "custField_1": "abcd", "custField_2": "bcde", "custField_3": "1"}', type: 'string', name: '消息内容：自定义消息字段容器（演示，DEMO改动不生效）'},
+		{ key: 'pushContent', value: '推送内容', type: 'string'},
+		{ key: 'pushData', value: 'pushData', type: 'string'},
+	],
+	action: function({
+		conversationType,
+		targetId,
+		customType,
+		objectName,
+		pushContent: pushContent,
+		pushData: pushData,
+	}) {
+		const msg = {
+			conversationType: conversationType,
+			targetId: targetId,
+			content: {
+				objectName: objectName,
+				customType: customType,
+				customFields: { "custField_1": "abcd",
+								"custField_2": "bcde",
+								"custField_3": "1"},
+			},
+			pushContent: pushContent,
+			pushData: pushData,
+		}
+		console.log('调用sendMessage方法', JSON.stringify(msg))
+		sendMessage(
+			msg,
+			(res) => {
+				console.log(JSON.stringify(res))
+				if (res.code === 0) {
+					_global.lastSendMsg = {
+						messageId: res.messageId,
+						conversationType: conversationType,
+						targetId: targetId
+					}
+				}
+				addPrimaryResult({
+					title: 'sendMessage',
+					code: res.code,
+					data: res
+				})
+			}
+		)
+	}
+}
+
 export const _sendChatroomMessage = {
 	name: "发送聊天室消息",
 	params: [

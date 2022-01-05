@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="uni.dcloud.io.uniplugin_module" >
-<application></application>
+    package="uni.dcloud.io.uniplugin_module">
+    <application>
+        <meta-data
+            android:name="rc.imuniapp"
+            android:value="io.dcloud.uniplugin.Version" />
+    </application>
 </manifest>

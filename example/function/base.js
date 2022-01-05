@@ -2,6 +2,7 @@
 import {
 	connect,
 	init, 
+	initWithSetup,
 	addConnectionStatusListener, 
 	disconnect,
 	setDeviceToken,
@@ -38,6 +39,35 @@ export const _Init = {
 		
 		addSuccessResult({
 			title: '调用初始化接口',
+			data: config.appkey
+		})
+	}
+}
+
+export const _InitEngineWithSetup = {
+	name: "使用配置参数初始化",
+	action: function() {
+		
+		const engineSetup = {
+			naviServer: config.navi,
+			fileServer: config.fileServer,
+			statisticServer: config.statisticServer,
+			appVersion: '1.0.1', // 用户 app version
+			androidPushConfig: {
+				miAppId: '',
+				miAppKey: '',
+				meizuAppId: '',
+				meizuAppKey: '',
+				oppoAppKey: '',
+				oppoAppSecret: '',
+			}
+		}
+
+		console.log('调用 initWithSetup: ', config.appkey, engineSetup);
+		initWithSetup(config.appkey, engineSetup);
+		
+		addSuccessResult({
+			title: 'initWithSetup',
 			data: config.appkey
 		})
 	}

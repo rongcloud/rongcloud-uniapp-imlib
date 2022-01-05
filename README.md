@@ -8,13 +8,12 @@
 
 ## 关键目录说明
 
-.
-├── README.md
-├── android                 // Android 端源码
-├── docs                    // 文档
-├── example                 // uniapp 测试 Demo
-├── ios                     // iOS 端源码
-└── src                     // TS 接口文件
+├── README.md 				// 使用说明				 	<br>
+├── android                 // Android 端源码			<br>
+├── docs                    // API 文档 					<br>
+├── example                 // uniapp 测试 Demo 			<br>
+├── ios                     // iOS 端源码 				<br>
+└── src                     // TS 接口文件				<br>
 
 ## 初始化
 ```
@@ -35,9 +34,3 @@ npm run release
 ```
 npm run doc
 ```
-
-# 手动导入原生插件文档
-
-[使用 Android Studio 导入安卓原生插件](android/android_uniim/README.md)
-
-[使用 Xcode 导入 ios 原生插件](ios/RCUniIM/手动导入.md)

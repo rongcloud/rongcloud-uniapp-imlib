@@ -1,5 +1,7 @@
 
 import {
+  RCAndroidPushConfig,
+  RCIMEngineSetup,
   ConnectionStatus,
   ConversationType,
   ErrorCode,
@@ -53,6 +55,15 @@ export function init (appKey: string) {
 }
 
 /**
+ * 初始化 SDK，只需要调用一次
+ * @param appKey 从融云开发者平台创建应用后获取到的 App Key
+ * @param engineSetup 引擎初始化配置参数
+ */
+export function initWithSetup(appKey: string, engineSetup: RCIMEngineSetup) {
+  RCIMClient.initWithSetup(appKey, engineSetup)
+}
+
+/**
  * 连接融云服务器，只需要调用一次  
  *
  * 在 App 整个生命周期，您只需要调用一次此方法与融云服务器建立连接。
@@ -88,12 +99,28 @@ export function init (appKey: string) {
 }
 
 /**
+ * 清除连接状态监听函数  
+ * 
+ */
+ export function clearConnectionStatusListener () {
+  RCIMClient.removeAllEventListeners("rcimlib-connection-status");
+}
+
+/**
  * 添加日志信息监听函数 
  *
  * @param listener
  */
 export function addLogInfoListener (listener: (result: UniListenerResult<LogInfoResult>) => void) {
   RCIMClient.addEventListener('rcimlib-log', listener)
+}
+
+/**
+ * 清除日志信息监听函数 
+ *
+ */
+ export function clearLogInfoListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-log')
 }
 
 /**
@@ -106,12 +133,28 @@ export function addRecallMessageListener (listener: (result: UniListenerResult<R
 }
 
 /**
+ * 添加消息撤回监听函数  
+ *
+ */
+ export function clearRecallMessageListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-recall')
+}
+
+/**
  * 添加消息监听函数 
  *
  * @param listener
  */
  export function addReceiveMessageListener (listener: (result: UniListenerResult<ReceiveMessage>) => void) {
   RCIMClient.addEventListener('rcimlib-receive-message', listener)
+}
+
+/**
+ * 清除消息监听函数 
+ *
+ */
+ export function clearReceiveMessageListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-receive-message')
 }
 
 /**
@@ -123,6 +166,13 @@ export function addRecallMessageListener (listener: (result: UniListenerResult<R
   RCIMClient.addEventListener('rcimlib-typing-status', listener)
 }
 
+/**
+ * 清除输入状态监听函数  
+ *
+ */
+ export function clearTypingStatusListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-typing-status')
+}
 /**
  * 添加推送消息到达监听函数
  *
@@ -383,13 +433,28 @@ export function addReadReceiptReceivedListener (listener: (message: UniListenerR
 }
 
 /**
+ * 清除私聊阅读回执监听函数
+ */
+ export function clearReadReceiptReceivedListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-read-receipt-received')
+}
+
+/**
  * 添加收到消息已读回执请求监听函数 
  *
  * 收到此请求后，如果用户阅读了对应的消息，需要调用
  * sendMessageReadReceiptResponse 接口发送已读响应
  */
-export function addReceiptRequestListener (listener: (data: UniListenerResult<ReceiptRequest>) => void) {
+ export function addReceiptRequestListener (listener: (data: UniListenerResult<ReceiptRequest>) => void) {
   RCIMClient.addEventListener('rcimlib-receipt-request', listener)
+}
+
+/**
+ * 清除收到消息已读回执请求监听函数 
+ *
+ */
+ export function clearReceiptRequestListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-receipt-request')
 }
 
 /**
@@ -397,8 +462,16 @@ export function addReceiptRequestListener (listener: (data: UniListenerResult<Re
  *
  * @param listener
  */
-export function addReceiptResponseListener (listener: (data: UniListenerResult<ReceiptResponse>) => void) {
+ export function addReceiptResponseListener (listener: (data: UniListenerResult<ReceiptResponse>) => void) {
   RCIMClient.addEventListener('rcimlib-receipt-response', listener)
+}
+
+/**
+ * 添加消息回执响应监听函数 
+ *
+ */
+ export function clearReceiptResponseListener () {
+  RCIMClient.removeAllEventListeners('rcimlib-receipt-response')
 }
 
 /**

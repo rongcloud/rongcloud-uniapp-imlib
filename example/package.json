@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "dependencies": {
-    "@rongcloud/imlib-uni": "^5.1.3-release.1"
+    "@rongcloud/imlib-uni": "file:../dist"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

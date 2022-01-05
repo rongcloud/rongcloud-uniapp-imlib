@@ -1,5 +1,6 @@
 
 import { _Init,
+	_InitEngineWithSetup,
   _Connect, 
   _Disconnect, 
   _SetDeviceToken, 
@@ -32,6 +33,7 @@ import {
  } from './conversation.js'
 import {
 	_sendMessage,
+	_sendCustomMessage,
 	_sendChatroomMessage,
 	_sendMediaMessage,
 	_sendSightMediaMessage,
@@ -100,6 +102,7 @@ export default [
 		title: '基础接口',
 		list: [
 			_Init,
+			_InitEngineWithSetup,
 			_InitListener,
 			_Connect,
 			_Disconnect,
@@ -137,6 +140,7 @@ export default [
 		title: '消息接口',
 		list: [
 			_sendMessage,
+			_sendCustomMessage,
 			_sendChatroomMessage,
 			_sendMediaMessage,
 			_sendSightMediaMessage,

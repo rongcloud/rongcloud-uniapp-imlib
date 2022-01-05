@@ -14,6 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.rongcloud.imlib.iw.confg.RCIMIWEngineSetup;
+import cn.rongcloud.imlib.iw.message.RCCommandMessage;
+import cn.rongcloud.imlib.iw.message.RCNormalMessage;
+import cn.rongcloud.imlib.iw.message.RCStatusMessage;
+import cn.rongcloud.imlib.iw.message.RCStorageMessage;
 import io.dcloud.feature.uniapp.bridge.UniJSCallback;
 import io.rong.imlib.IRongCoreCallback;
 import io.rong.imlib.IRongCoreEnum;
@@ -37,8 +42,60 @@ import io.rong.message.ReadReceiptMessage;
 import io.rong.message.RecallNotificationMessage;
 import io.rong.message.TextMessage;
 import io.rong.message.VoiceMessage;
+import io.rong.push.pushconfig.PushConfig;
 
 class Convert {
+    private static final int CUSTOM_COMMAND_MESSAGE = 0;
+    private static final int CUSTOM_STORAGE_MESSAGE = 1;
+    private static final int CUSTOM_NORMAL_MESSAGE = 2;
+    private static final int CUSTOM_STATUS_MESSAGE = 3;
+
+    static String getStringFromMap( String key, Map<String, Object> map) {
+        if (null == map || !map.containsKey(key))
+            return "";
+        return map.get(key).toString();
+    }
+
+    static RCIMIWEngineSetup toEngineSetup(Map<String, Object> setup) {
+        String navServer = getStringFromMap("naviServer", setup);
+        String fileServer = getStringFromMap("fileServer", setup);
+        String statisticServer = getStringFromMap("statisticServer", setup);
+        String appVersion = getStringFromMap("appVersion", setup);
+
+        RCIMIWEngineSetup.Builder builder = RCIMIWEngineSetup.newBuilder();
+
+        if (!TextUtils.isEmpty(appVersion))
+            builder = builder.appVersion(appVersion);
+
+        if (!TextUtils.isEmpty(navServer) && !TextUtils.isEmpty(fileServer))
+            builder = builder.serverInfo(navServer, fileServer);
+
+        if (!TextUtils.isEmpty(statisticServer))
+            builder = builder.statisticServer(statisticServer);
+
+        Map<String, Object> pushConfigMap = (Map<String, Object>) setup.get("androidPushConfig");
+        if (pushConfigMap == null) {
+            return builder.build();
+        }
+        String miAppId = getStringFromMap("miAppId", pushConfigMap);
+        String miAppKey = getStringFromMap("miAppKey", pushConfigMap);
+        String meizuAppId = getStringFromMap("meizuAppId", pushConfigMap);
+        String meizuAppKey = getStringFromMap("meizuAppKey", pushConfigMap);
+        String oppoAppKey = getStringFromMap("oppoAppKey", pushConfigMap);
+        String oppoAppSecret = getStringFromMap("oppoAppSecret", pushConfigMap);
+
+        PushConfig.Builder pushConfigBuilder = new PushConfig.Builder();
+
+        if (!TextUtils.isEmpty(miAppId) && !TextUtils.isEmpty(miAppKey))
+            pushConfigBuilder = pushConfigBuilder.enableMiPush(miAppId, miAppKey);
+        if (!TextUtils.isEmpty(meizuAppId) && !TextUtils.isEmpty(meizuAppKey))
+            pushConfigBuilder = pushConfigBuilder.enableMeiZuPush(meizuAppId, meizuAppKey);
+        if (!TextUtils.isEmpty(oppoAppKey) && !TextUtils.isEmpty(oppoAppSecret))
+            pushConfigBuilder = pushConfigBuilder.enableOppoPush(oppoAppKey, oppoAppSecret);
+
+        builder = builder.androidPushConfig(pushConfigBuilder.build());
+        return builder.build();
+    }
 
     static Map<String, Object> toJSON(Message message) {
         Map<String, Object> map = new HashMap<>();
@@ -229,6 +286,42 @@ class Convert {
                 map.put("extra", message.getExtra());
                 break;
             }
+            case "RC:IWCmdMsg": {
+                RCCommandMessage iwCmdMsg = (RCCommandMessage) content;
+                map.put("objectName", iwCmdMsg.messageType);
+                map.put("extra", TextUtils.isEmpty(iwCmdMsg.getExtra()) ? "" : iwCmdMsg.getExtra());
+                map.put("customType", CUSTOM_COMMAND_MESSAGE);
+                map.put("customFields", iwCmdMsg.messageFields);
+
+                break;
+            }
+            case "RC:IWStorageMsg": {
+                RCStorageMessage iwStoreMsg = (RCStorageMessage) content;
+                map.put("objectName", iwStoreMsg.messageType);
+                map.put("extra", TextUtils.isEmpty(iwStoreMsg.getExtra()) ? "" : iwStoreMsg.getExtra());
+                map.put("customType", CUSTOM_STORAGE_MESSAGE);
+                map.put("customFields", iwStoreMsg.messageFields);
+
+                break;
+            }
+            case "RC:IWNormalMsg": {
+                RCNormalMessage iwNormalMsg = (RCNormalMessage) content;
+                map.put("objectName", iwNormalMsg.messageType);
+                map.put("extra", TextUtils.isEmpty(iwNormalMsg.getExtra()) ? "" : iwNormalMsg.getExtra());
+                map.put("customType", CUSTOM_NORMAL_MESSAGE);
+                map.put("customFields", iwNormalMsg.messageFields);
+
+                break;
+            }
+            case "RC:IWStatusMsg": {
+                RCStatusMessage iwStatusMsg = (RCStatusMessage) content;
+                map.put("objectName", iwStatusMsg.messageType);
+                map.put("extra", TextUtils.isEmpty(iwStatusMsg.getExtra()) ? "" : iwStatusMsg.getExtra());
+                map.put("customType", CUSTOM_STATUS_MESSAGE);
+                map.put("customFields", iwStatusMsg.messageFields);
+
+                break;
+            }
         }
 
         if (content != null && content.getUserInfo() != null) {
@@ -278,13 +371,45 @@ class Convert {
         return Message.obtain((String) map.get("targetId"), conversationType, content);
     }
 
+    static MessageContent toCustomMessageContent(Map<String, Object> map) {
+        MessageContent content = null;
+
+        if (false == map.containsKey("customType") || false == map.containsKey("objectName")
+                || false == map.containsKey("customFields")) {
+            return null;
+        }
+
+        int customMessageType = Integer.parseInt(map.get("customType").toString());
+        String customMessageObjectName = (String) map.get("objectName");
+        Map<String, String> customMessageFields = (Map<String, String>) map.get("customFields");
+
+        if (customMessageType < 0 || customMessageType > 3 || TextUtils.isEmpty(customMessageObjectName)
+                || customMessageFields == null || customMessageFields.size() <= 0) {
+            return null;
+        }
+
+        if (customMessageType == CUSTOM_COMMAND_MESSAGE) {
+            content = new RCCommandMessage(customMessageObjectName, customMessageFields);
+        } else if (customMessageType == CUSTOM_STORAGE_MESSAGE) {
+            content = new RCStorageMessage(customMessageObjectName, customMessageFields);
+        } else if (customMessageType == CUSTOM_NORMAL_MESSAGE) {
+            content = new RCNormalMessage(customMessageObjectName, customMessageFields);
+        } else if (customMessageType == CUSTOM_STATUS_MESSAGE) {
+            content = new RCStatusMessage(customMessageObjectName, customMessageFields);
+        }
+        return content;
+    }
+
     static MessageContent toMessageContent(Context context, Map<String, Object> map) {
         if (map == null) {
             return null;
         }
-        String objectName = (String) map.get("objectName");
         MessageContent messageContent = null;
-        if (objectName != null) {
+        String objectName = (String) map.get("objectName");
+
+        if (map.containsKey("customType") && map.containsKey("customFields")) {
+            messageContent = toCustomMessageContent(map);
+        } else if (objectName != null) {
             switch (objectName) {
                 case "RC:TxtMsg":
                     messageContent = TextMessage.obtain((String) map.get("content"));

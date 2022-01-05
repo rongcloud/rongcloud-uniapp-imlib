@@ -3,3 +3,12 @@ node_modules
 dist
 build
 release
+*.project
+*.prefs
+android/RCUniIM/.gradle/
+android/RCUniIM/.idea/
+android/RCUniIM/local.properties
+android/android_uniim/.idea/
+.DS_Store
+.gradle
+package-lock.json

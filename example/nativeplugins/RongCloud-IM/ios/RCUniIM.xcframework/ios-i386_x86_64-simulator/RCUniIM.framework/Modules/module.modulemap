@@ -1,0 +1,6 @@
+framework module RCUniIM {
+  umbrella header "RCUniIM.h"
+
+  export *
+  module * { export * }
+}

@@ -67,16 +67,12 @@
 				<a href="#关键目录说明" id="关键目录说明" style="color: inherit; text-decoration: none;">
 					<h2>关键目录说明</h2>
 				</a>
-				<ol>
-					<li>src: ts代码</li>
-					<li>example: uniapp 测试demo</li>
-					<li>example/config/config.js： 连接配置信息</li>
-					<li>function: 测试接口目录</li>
-					<li>example/nativeplugins: 原生插件目录</li>
-					<li>docs: 文档</li>
-					<li>ios: iOS 端源码</li>
-					<li>android: Android 端源码</li>
-				</ol>
+				<p>├── README.md                 // 使用说明                     <br>
+					├── android                 // Android 端源码            <br>
+					├── docs                    // API 文档                     <br>
+					├── example                 // uniapp 测试 Demo             <br>
+					├── ios                     // iOS 端源码                 <br>
+				└── src                     // TS 接口文件                <br></p>
 				<a href="#初始化" id="初始化" style="color: inherit; text-decoration: none;">
 					<h2>初始化</h2>
 				</a>
@@ -97,12 +93,6 @@
 				</a>
 				<pre><code><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">doc</span>
 </code></pre>
-				<a href="#手动导入原生插件文档" id="手动导入原生插件文档" style="color: inherit; text-decoration: none;">
-					<h1>手动导入原生插件文档</h1>
-				</a>
-				<p><a href="%E6%89%8B%E5%8A%A8%E5%AF%BC%E5%85%A5.md">使用 HBuilder X 导入原生插件</a></p>
-				<p><a href="android/android_uniim/README.md">使用 Android Studio 导入安卓原生插件</a></p>
-				<p><a href="ios/RCUniIM/%E6%89%8B%E5%8A%A8%E5%AF%BC%E5%85%A5.md">使用 Xcode 导入 ios 原生插件</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -129,6 +119,9 @@
 					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/ConversationType.html" class="tsd-kind-icon">Conversation<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/CustomMessageType.html" class="tsd-kind-icon">Custom<wbr>Message<wbr>Type</a>
 					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/ErrorCode.html" class="tsd-kind-icon">Error<wbr>Code</a>
@@ -206,6 +199,9 @@
 						<a href="interfaces/CountResult.html" class="tsd-kind-icon">Count<wbr>Result</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/CustomMessage.html" class="tsd-kind-icon">Custom<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/Discussion.html" class="tsd-kind-icon">Discussion</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -276,6 +272,12 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/PushNotificationMessage.html" class="tsd-kind-icon">Push<wbr>Notification<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/RCAndroidPushConfig.html" class="tsd-kind-icon">RCAndroid<wbr>Push<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/RCIMEngineSetup.html" class="tsd-kind-icon">RCIMEngine<wbr>Setup</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ReadReceiptMessage.html" class="tsd-kind-icon">Read<wbr>Receipt<wbr>Message</a>
@@ -374,13 +376,37 @@
 						<a href="modules.html#cleanRemoteHistoryMessages" class="tsd-kind-icon">clean<wbr>Remote<wbr>History<wbr>Messages</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="modules.html#clearConnectionStatusListener" class="tsd-kind-icon">clear<wbr>Connection<wbr>Status<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#clearLogInfoListener" class="tsd-kind-icon">clear<wbr>Log<wbr>Info<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="modules.html#clearMessages" class="tsd-kind-icon">clear<wbr>Messages</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#clearMessagesUnreadStatus" class="tsd-kind-icon">clear<wbr>Messages<wbr>Unread<wbr>Status</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="modules.html#clearReadReceiptReceivedListener" class="tsd-kind-icon">clear<wbr>Read<wbr>Receipt<wbr>Received<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#clearRecallMessageListener" class="tsd-kind-icon">clear<wbr>Recall<wbr>Message<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#clearReceiptRequestListener" class="tsd-kind-icon">clear<wbr>Receipt<wbr>Request<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#clearReceiptResponseListener" class="tsd-kind-icon">clear<wbr>Receipt<wbr>Response<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#clearReceiveMessageListener" class="tsd-kind-icon">clear<wbr>Receive<wbr>Message<wbr>Listener</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="modules.html#clearTextMessageDraft" class="tsd-kind-icon">clear<wbr>Text<wbr>Message<wbr>Draft</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#clearTypingStatusListener" class="tsd-kind-icon">clear<wbr>Typing<wbr>Status<wbr>Listener</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#connect" class="tsd-kind-icon">connect</a>
@@ -477,6 +503,9 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#init" class="tsd-kind-icon">init</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="modules.html#initWithSetup" class="tsd-kind-icon">init<wbr>With<wbr>Setup</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="modules.html#insertIncomingMessage" class="tsd-kind-icon">insert<wbr>Incoming<wbr>Message</a>

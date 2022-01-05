@@ -191,6 +191,63 @@ export interface MessageContent {
   mentionedInfo?: MentionedInfo;
 }
 
+export interface RCAndroidPushConfig {
+  miAppId?: string,
+  miAppKey?: string,
+
+  meizuAppId?: string,
+  meizuAppKey?: string,
+
+  oppoAppKey?: string,
+  oppoAppSecret?: string,
+}
+
+export interface RCIMEngineSetup {
+  naviServer?: string,
+  fileServer?: string,
+  statisticServer?: string,
+  appVersion?: string,
+
+  androidPushConfig?: RCAndroidPushConfig,
+}
+
+/**
+ * 自定义消息类型
+ */
+export enum CustomMessageType {
+  /**
+   * 命令消息，不存储、不计入未读计数
+   */
+  COMMAND,
+  /**
+   * 存储消息，存储、不计入未读计数
+   */
+  STORAGE,
+  /**
+   * 普通消息，存储、计入未读计数
+   */
+  NORMAL,
+  /**
+   * 状态消息，不存储不计数
+   */
+  STATUS
+}
+
+/**
+ * 自定义消息，不支持自定义媒体类型消息.
+ * 使用自定义消息，必须设置 type 指明自定义消息类型，另外还必须设置 objectName ，指明消息对象名称
+ */
+export interface CustomMessage extends MessageContent {
+  /**
+   * 发送自定义消息，需要设置类型
+   */
+  customType: CustomMessageType,
+  /**
+   * 自定义消息数据集合
+   */
+  customFields: { [key: string]: string };
+}
+
 /**
  * 消息对象名称枚举
  */
@@ -717,7 +774,7 @@ export interface ChatRoomInfoResult extends BaseResult {
 /**
  * 搜索会话结果
  */
- export interface SearchConversationResult extends BaseResult {
+export interface SearchConversationResult extends BaseResult {
   result?: {
     conversation: Conversation;
     matchCount: number;
@@ -1028,7 +1085,7 @@ export interface PushConfig {
 /**
  * 发送进度消息回调
  */
- export interface SentProgressMessageCallback {
+export interface SentProgressMessageCallback {
   success?: (messageId: number) => void;
   progress?: (progress: number, messageId: number) => void;
   cancel?: (messageId: number) => void;
@@ -1037,7 +1094,7 @@ export interface PushConfig {
 
 /**
  * 发送进度消息回调参数
-*/ 
+*/
 export interface ProgressMessageResult {
   type: ResponseType,
   eventId: string,

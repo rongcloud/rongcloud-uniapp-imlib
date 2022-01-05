@@ -28,9 +28,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-
     compileOnly fileTree(dir: '../app/libs', include: ['uniapp-v8-release.aar'])
+    compileOnly fileTree(dir: 'libs', include: ['*.aar', '*.jar'])
 
 //    compileOnly "com.android.support:recyclerview-v7:28.0.0"
 //    compileOnly "com.android.support:support-v4:28.0.0"
