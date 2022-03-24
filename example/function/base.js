@@ -8,7 +8,7 @@ import {
 	setDeviceToken,
 	setServerInfo,
 	getConnectionStatus
-} from "@rongcloud/imlib-uni"
+} from "@/uni_modules/RongCloud-IMWrapper/js_sdk"
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import config from '../config/config.js'
 import initListener from './listener.js'

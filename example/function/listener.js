@@ -10,7 +10,7 @@ import {
 	addReadReceiptReceivedListener,
 	addReceiptRequestListener,
 	addReceiptResponseListener
-} from "@rongcloud/imlib-uni"
+} from "@/uni_modules/RongCloud-IMWrapper/js_sdk"
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import _global from '../config/global.js'
 

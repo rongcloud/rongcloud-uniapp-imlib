@@ -10,12 +10,28 @@
 #import <RongIMLibCore/RCUtilities.h>
 #import <RongChatRoom/RongChatRoom.h>
 #import <RongIMWrapper/RongIMWrapper.h>
+#import <AVFoundation/AVAsset.h>
+#import <AVFoundation/AVAssetImageGenerator.h>
+#import <AVFoundation/AVTime.h>
+#import <objc/runtime.h>
+#import <RongIMLibCore/RongIMLibCore.h>
+
+static NSString * const VER = @"private-5.1.3-3";
 
 @interface RCUniIM ()<RCConnectionStatusChangeDelegate,RCIMClientReceiveMessageDelegate, RCTypingStatusDelegate, RCLogInfoDelegate>
 
 @end
 
 @implementation RCUniIM
+
++ (void)load {
+    // IM 升级 5.1.5 之后可放开
+    // [RCUtilities setModuleName:@"calluniapp" version:[self getVersion]];
+}
+
++ (NSString *) getVersion {
+    return VER;
+}
 
 UNI_EXPORT_METHOD_SYNC(@selector(check:value:));
 - (void)check:(NSString *)mName value:(id)value {
@@ -47,13 +63,30 @@ UNI_EXPORT_METHOD_SYNC(@selector(init:));
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWStorageMessage.class];
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWNormalMessage.class];
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWStatusMessage.class];
+        [[RCCoreClient sharedCoreClient] registerMessageType: RCSightMessage.class];
         
-//        [RCUtilities setModuleVersion:@"rc.imuniapp" version:@"5.1.3-shell_replace.3"];
         [RCCoreClient sharedCoreClient].logLevel = RC_Log_Level_Verbose;
+        
         [[RCCoreClient sharedCoreClient] setRCConnectionStatusChangeDelegate:self];
         [[RCCoreClient sharedCoreClient] setReceiveMessageDelegate:self object:nil];
         [[RCCoreClient sharedCoreClient] setRCTypingStatusDelegate:self];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(receiveMessageHasReadNotification:)
+                                                     name:RCLibDispatchReadReceiptNotification
+                                                   object:nil];
     }];
+}
+
+- (void)receiveMessageHasReadNotification:(NSNotification *)notification {
+    NSDictionary *dict = @{
+        @"conversationType":[notification.userInfo objectForKey:@"cType"],
+        @"messageTime":[notification.userInfo objectForKey:@"messageTime"],
+        @"targetId":[notification.userInfo objectForKey:@"tId"]
+    };
+    [self sendEventWithName:@"rcimlib-read-receipt-received"
+                       body:dict];
 }
 
 //- (void)sendDirectionalMessage:(NSDictionary *)message userIdList:(NSArray *)userIdList callback:(UniModuleKeepAliveCallback)callback {//done
@@ -70,21 +103,28 @@ UNI_EXPORT_METHOD_SYNC(@selector(initWithSetup:setup:));
             engineSetup.appVersion = setup[@"appVersion"];
         }
         
-        if(engineSetup != nil){
-            [RCIMIWEngine initWithAppKey:key ];
-        }else {
+        if (engineSetup != nil) {
             [RCIMIWEngine initWithAppKey:key config:engineSetup];
+        } else {
+            [RCIMIWEngine initWithAppKey:key];
         }
         
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWCommandMessage.class];
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWStorageMessage.class];
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWNormalMessage.class];
         [[RCCoreClient sharedCoreClient] registerMessageType: RCIMIWStatusMessage.class];
+        [[RCCoreClient sharedCoreClient] registerMessageType: RCSightMessage.class];
         
         [RCCoreClient sharedCoreClient].logLevel = RC_Log_Level_Verbose;
         [[RCCoreClient sharedCoreClient] setRCConnectionStatusChangeDelegate:self];
         [[RCCoreClient sharedCoreClient] setReceiveMessageDelegate:self object:nil];
         [[RCCoreClient sharedCoreClient] setRCTypingStatusDelegate:self];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(receiveMessageHasReadNotification:)
+                                                     name:RCLibDispatchReadReceiptNotification
+                                                   object:nil];
     }];
 }
 
@@ -1034,8 +1074,8 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
                      }];
 }
 
-- (void)onMessageRecalled:(long)messageId {//done
-    [self sendEventWithName:@"rcimlib-recall" body:@{@"messageId":@(messageId)}];
+- (void)messageDidRecall:(RCMessage *)message {
+    [self sendEventWithName:@"rcimlib-recall" body:@{@"messageId":@(message.messageId)}];
 }
 
 - (void)onMessageReceiptResponse:(RCConversationType)conversationType
@@ -1047,7 +1087,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
                        @"conversationType" : @(conversationType),
                        @"targetId" : targetId ? targetId : @"",
                        @"messageUId" : messageUId ? messageUId : @"",
-                       @"users" : userIdList ? messageUId : [NSDictionary new],
+                       @"users" : userIdList ? userIdList : [NSDictionary new],
                      }];
 }
 
@@ -1118,6 +1158,41 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
     return messageContent;
 }
 
++ (UIImage *)getVideoPreViewImage:(NSString *)path {
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        return nil;
+    }
+    
+    if(![path hasPrefix:@"file://"]) {// 必须加 file:// 前缀才能被 AVFoundation 正常识别
+        path = [NSString stringWithFormat:@"file://%@",path];
+    }
+    AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL URLWithString:path]];
+    AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    generator.appliesPreferredTrackTransform = YES;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    NSError *error = nil;
+    CMTime actualTime;
+    CGImageRef image = [generator copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    UIImage *shotImage = [[UIImage alloc] initWithCGImage:image];
+    CGImageRelease(image);
+    return shotImage;
+}
+
++ (UIImage *)getThumbnailImage:(NSString *)thumbnailBase64String {
+    if (!thumbnailBase64String) {
+        NSLog(@"getThumbnailImage thumbnailBase64String is nil");
+        return nil;;
+    }
+    NSData *imageData = nil;
+    if (class_getInstanceMethod([NSData class], @selector(initWithBase64EncodedString:options:))) {
+        imageData = [[NSData alloc] initWithBase64EncodedString:thumbnailBase64String options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    } else {
+        imageData = [RCUtilities dataWithBase64EncodedString:thumbnailBase64String];
+    }
+    UIImage *thumbnailImage = [UIImage imageWithData:imageData];
+    return thumbnailImage;
+}
+
 - (RCMessageContent *)toMessageContent:(NSDictionary *)content {
     NSString *objectName = content[@"objectName"];
     RCMessageContent *messageContent;
@@ -1132,16 +1207,26 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
         } else if ([objectName isEqualToString:@"RC:ImgMsg"]) {
             NSString *local = content[@"local"];
             local = [local stringByReplacingOccurrencesOfString:@"file://" withString:@""];
-            RCImageMessage *image = [RCImageMessage
-                                     messageWithImageURI:local];
+            RCImageMessage *image = [RCImageMessage messageWithImageURI:local];
             image.extra = content[@"extra"];
             messageContent = image;
         } else if ([objectName isEqualToString:@"RC:FileMsg"]) {
             NSString *local = content[@"local"];
-            RCFileMessage *file = [RCFileMessage
-                                   messageWithFile:[local stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
+            RCFileMessage *file = [RCFileMessage messageWithFile:[local stringByReplacingOccurrencesOfString:@"file://" withString:@""]];
             file.extra = content[@"extra"];
             messageContent = file;
+        } else if ([objectName isEqualToString:@"RC:SightMsg"]) {
+            NSString *local = content[@"local"];
+            NSString *thumbnailBase64String = [content valueForKey:@"base64"];
+            UIImage *thumbImg = [RCUniIM getVideoPreViewImage:local];
+            if (!thumbImg) {
+                thumbImg = [RCUniIM getThumbnailImage:thumbnailBase64String];
+            }
+            RCSightMessage *sight = [RCSightMessage messageWithLocalPath:[local stringByReplacingOccurrencesOfString:@"file://" withString:@""]
+                                                               thumbnail:thumbImg
+                                                                duration:[content[@"duration"] intValue]];
+            sight.extra = content[@"extra"];
+            messageContent = sight;
         } else if ([objectName isEqualToString:@"RC:VcMsg"]) {
             NSData *data = [[NSData alloc] initWithBase64EncodedString:content[@"data"] options:0];
             RCVoiceMessage *voice = [RCVoiceMessage messageWithAudio:data
@@ -1165,7 +1250,12 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
             message.extra = content[@"extra"];
             messageContent = message;
         } else if ([objectName isEqualToString:@"RC:GIFMsg"]) {
-            // TODO: RCGIFMessage
+            RCGIFMessage *message = [RCGIFMessage messageWithGIFURI:content[@"local"]
+                                                              width:[content[@"width"] longValue]
+                                                             height:[content[@"height"] longValue]];
+            message.gifDataSize = [content[@"gifDataSize"] longLongValue];
+            message.extra = content[@"extra"];
+            messageContent = message;
         }
     }
     
@@ -1175,6 +1265,10 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
             messageContent.senderUserInfo = [[RCUserInfo alloc] initWithUserId:userInfo[@"userId"]
                                                                           name:userInfo[@"name"]
                                                                       portrait:userInfo[@"portraitUrl"]];
+            NSString *extra = userInfo[@"extra"];
+            if (extra) {
+                messageContent.senderUserInfo.extra = extra;
+            }
         }
         
         NSDictionary *mentionedInfo = content[@"mentionedInfo"];
@@ -1259,6 +1353,21 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
   };
 }
 
+- (NSDictionary *)fromContentUserInfo:(RCUserInfo *)userInfo {
+    if (userInfo == nil) {
+        NSLog(@"RCIMClib: userInfo invaild");
+        return @{};
+    }
+    // 为保持和输入出一致 此处 portraitUri 定义为 portraitUrl
+    NSDictionary *dict = @{
+        @"userId":userInfo.userId ? userInfo.userId : @"",
+        @"name":userInfo.name ? userInfo.name : @"",
+        @"portraitUrl":userInfo.portraitUri ? userInfo.portraitUri : @"",
+        @"extra":userInfo.extra ? userInfo.extra : @"",
+    };
+    return dict;
+}
+
 - (NSDictionary *)fromMessageContent:(RCMessageContent *)content {
   if ([content isKindOfClass:[RCImageMessage class]]) {
     RCImageMessage *image = (RCImageMessage *)content;
@@ -1267,14 +1376,16 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"local" : image.localPath ? image.localPath : @"",
       @"remote" : image.remoteUrl ? image.remoteUrl : @"",
       @"isFull" : @(image.isFull),
-      @"extra" : image.extra ? image.extra : @""
+      @"extra" : image.extra ? image.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCTextMessage class]]) {
     RCTextMessage *text = (RCTextMessage *)content;
     return @{
       @"objectName" : @"RC:TxtMsg",
       @"content" : text.content ? text.content : @"",
-      @"extra" : text.extra ? text.extra : @""
+      @"extra" : text.extra ? text.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCFileMessage class]]) {
     RCFileMessage *file = (RCFileMessage *)content;
@@ -1286,7 +1397,21 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"fileType" : file.type ? file.type : @"",
       @"size" : @(file.size),
       @"extra" : file.extra ? file.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
+  } else if ([content isKindOfClass:[RCSightMessage class]]) {
+      RCSightMessage *sight = (RCSightMessage *)content;
+      return @{
+          @"objectName" : @"RC:SightMsg",
+          @"local" : sight.localPath ? sight.localPath : @"",
+          @"remote" : sight.sightUrl ? sight.sightUrl : @"",
+          @"base64" : sight.thumbnailImage ? [RCUtilities base64EncodedStringFrom:UIImagePNGRepresentation(sight.thumbnailImage)] : @"",
+          @"name" : sight.name ? sight.name : @"",
+          @"size" : @(sight.size),
+          @"duration" : @(sight.duration),
+          @"extra" : sight.extra ? sight.extra : @"",
+          @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
+      };
   } else if ([content isKindOfClass:[RCVoiceMessage class]]) {
     RCVoiceMessage *message = (RCVoiceMessage *)content;
     NSString *data = @"";
@@ -1298,6 +1423,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"data" : data ? data : @"",
       @"duration" : @(message.duration),
       @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCRecallNotificationMessage class]]) {
     RCRecallNotificationMessage *message = (RCRecallNotificationMessage *)content;
@@ -1307,6 +1433,8 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"recallTime" : @(message.recallTime),
       @"originalObjectName" : message.originalObjectName ? message.originalObjectName : @"",
       @"isAdmin" : @(message.isAdmin),
+      @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCContactNotificationMessage class]]) {
     RCContactNotificationMessage *message = (RCContactNotificationMessage *)content;
@@ -1316,14 +1444,17 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"targetUserId" : message.targetUserId ? message.targetUserId : @"",
       @"message" : message.message ?  message.message : @"",
       @"operation" : message.operation ? message.operation : @"",
-      @"extra" : message.extra ? message.extra : @""
+      @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCCommandNotificationMessage class]]) {
     RCCommandNotificationMessage *message = (RCCommandNotificationMessage *)content;
     return @{
         @"objectName" : @"RC:CmdNtf",
         @"name" : message.name ? message.name : @"",
-        @"data" : message.data ? message.data : @""
+        @"data" : message.data ? message.data : @"",
+        @"extra" : message.extra ? message.extra : @"",
+        @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCProfileNotificationMessage class]]) {
     RCProfileNotificationMessage *message = (RCProfileNotificationMessage *)content;
@@ -1331,14 +1462,16 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"objectName" : @"RC:ProfileNtf",
       @"operation" : message.operation ? message.operation : @"",
       @"data" : message.data ? message.data : @"",
-      @"extra" : message.extra ? message.extra : @""
+      @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCInformationNotificationMessage class]]) {
     RCInformationNotificationMessage *message = (RCInformationNotificationMessage *)content;
     return @{
       @"objectName" : @"RC:InfoNtf",
       @"message" : message.message ? message.message : @"",
-      @"extra" : message.extra ? message.extra : @""
+      @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCGroupNotificationMessage class]]) {
     RCGroupNotificationMessage *message = (RCGroupNotificationMessage *)content;
@@ -1348,7 +1481,8 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"operatorUserId" : message.operatorUserId ? message.operatorUserId : @"",
       @"message" : message.message ? message.message : @"",
       @"data" : message.data ? message.data : @"",
-      @"extra" : message.extra ? message.extra : @""
+      @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCHQVoiceMessage class]]) {
     RCHQVoiceMessage *message = (RCHQVoiceMessage *)content;
@@ -1358,6 +1492,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"remote" : message.remoteUrl ? message.remoteUrl : @"",
       @"duration" : @(message.duration),
       @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCGIFMessage class]]) {
     RCGIFMessage *message = (RCGIFMessage *)content;
@@ -1369,6 +1504,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
       @"height" : @(message.height),
       @"gifDataSize" : @(message.gifDataSize),
       @"extra" : message.extra ? message.extra : @"",
+      @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
     };
   } else if ([content isKindOfClass:[RCIMIWCommandMessage class]]){
       RCIMIWCommandMessage *message = (RCIMIWCommandMessage*)content;
@@ -1377,6 +1513,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
           @"extra" : message.extra ? message.extra : @"",
           @"customType": @(0),
           @"customFields": message.mFields,
+          @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
       };
   }else if ([content isKindOfClass:[RCIMIWStorageMessage class]]){
       RCIMIWStorageMessage *message = (RCIMIWStorageMessage*)content;
@@ -1385,6 +1522,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
           @"extra" : message.extra ? message.extra : @"",
           @"customType": @1,
           @"customFields":message.mFields,
+          @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
       };
   }else if ([content isKindOfClass:[RCIMIWNormalMessage class]]){
       RCIMIWNormalMessage *message = (RCIMIWNormalMessage*)content;
@@ -1393,6 +1531,7 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
           @"extra" : message.extra ? message.extra : @"",
           @"customType": @2,
           @"customFields": message.mFields,
+          @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
       };
   }else if ([content isKindOfClass:[RCIMIWStatusMessage class]]){
       RCIMIWStatusMessage *message = (RCIMIWStatusMessage*)content;
@@ -1401,6 +1540,14 @@ UNI_EXPORT_METHOD(@selector(setPushLanguageCode:callback:));//done
           @"extra" : message.extra ? message.extra : @"",
           @"customType": @3,
           @"customFields":message.mFields,
+          @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
+      };
+  } else if ([content isKindOfClass:[RCCommandMessage class]]) {
+      RCCommandMessage *message = (RCCommandMessage *)content;
+      return @{
+          @"data" : message.data,
+          @"name" : message.name,
+          @"userInfo" : [self fromContentUserInfo:content.senderUserInfo]
       };
   }
 

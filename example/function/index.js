@@ -37,6 +37,7 @@ import {
 	_sendChatroomMessage,
 	_sendMediaMessage,
 	_sendSightMediaMessage,
+	_sendFileMessage,
 	_sendVoiceMessage,
 	_sendDirectionalMessage,
 	_recallMessage,
@@ -65,7 +66,9 @@ import {
 	_getUnreadMentionedMessages,
 	_getRemoteHistoryMessages,
 	_cleanRemoteHistoryMessages,
-	_cleanHistoryMessages
+	_cleanHistoryMessages,
+  _searchMessages,
+  _searchMessagesByUserId
 } from './message.js'
 import {
 	_joinChatRoom,
@@ -144,6 +147,7 @@ export default [
 			_sendChatroomMessage,
 			_sendMediaMessage,
 			_sendSightMediaMessage,
+			_sendFileMessage,
 			_sendVoiceMessage,
 			_sendDirectionalMessage,
 			_recallMessage,
@@ -172,7 +176,9 @@ export default [
 			_getUnreadMentionedMessages,
 			_getRemoteHistoryMessages,
 			_cleanRemoteHistoryMessages,
-			_cleanHistoryMessages
+			_cleanHistoryMessages,
+      _searchMessages,
+      _searchMessagesByUserId
 		]
 	},
 	{

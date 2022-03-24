@@ -5,7 +5,7 @@ import {
 	quitChatRoom,
 	getRemoteChatRoomHistoryMessages,
 	getChatRoomInfo
-} from "@rongcloud/imlib-uni"
+} from "@/uni_modules/RongCloud-IMWrapper/js_sdk"
 import {addSuccessResult, addErrorResult, addPrimaryResult} from '../util/common.js'
 import config from '../config/config.js'
 let baseConfig = uni.getStorageSync('testBaseConfig')

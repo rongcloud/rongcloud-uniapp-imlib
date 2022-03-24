@@ -2,12 +2,12 @@
 //  RCIMIWPushNotificationMessage.h
 //  RongIMWrapper
 //
-//  Created by joyoki on 2021/12/24.
+//  Created by RongCloud on 2021/12/24.
 //
 
 #import <Foundation/Foundation.h>
 #import <RongIMLibCore/RongIMLibCore.h>
-#import "RCIMIWDefine.h"
+#import <RongIMWrapper/RCIMIWDefine.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

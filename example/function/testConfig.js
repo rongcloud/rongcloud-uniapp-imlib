@@ -3,7 +3,7 @@ import config from '../config/config.js'
 import { addSuccessResult, addErrorResult, addWarnResult, addPrimaryResult } from '../util/common.js'
 import {
 	initNativePlugin
-} from "@rongcloud/imlib-uni"
+} from "@/uni_modules/RongCloud-IMWrapper/js_sdk"
 
 const userList = config.userList.map(i => {
 	return {

@@ -2,7 +2,7 @@
 //  RCIMIWDefine.h
 //  RongIMWrapper
 //
-//  Created by joyoki on 2021/12/24.
+//  Created by RongCloud on 2021/12/24.
 //
 
 #ifndef RCIMIWDefine_h
@@ -10,10 +10,14 @@
 
 #import <Foundation/Foundation.h>
 #import <RongIMLibCore/RongIMLibCore.h>
+#import <RongChatRoom/RongChatRoom.h>
 
 @class RCIMIWPushNotificationMessage;
+@class RCIMIWTypingStatus;
 
-/// 连接状态
+/*!
+ 连接状态
+ */
 typedef NS_ENUM(NSInteger, RCIMIWConnectionStatus) {
     
     /// 未知错误
@@ -47,6 +51,9 @@ typedef NS_ENUM(NSInteger, RCIMIWConnectionStatus) {
     RCIMIWConnectionStatusTimeout = 14
 };
 
+/*!
+ 推送渠道类型
+ */
 typedef NSString * RCIMIWPushType;
 extern RCIMIWPushType const RCIMIWPushType_UNKNOWN;
 extern RCIMIWPushType const RCIMIWPushType_RONG;
@@ -59,20 +66,116 @@ extern RCIMIWPushType const RCIMIWPushType_VIVO;
 extern RCIMIWPushType const RCIMIWPushType_OPPO;
 extern RCIMIWPushType const RCIMIWPushType_APPLE;
 
+/*!
+ 推送类型
+ */
 typedef NSString * RCIMIWPushSourceType;
 extern RCIMIWPushSourceType const RCIMIWPushSourceTypeUnkown;
 extern RCIMIWPushSourceType const RCIMIWPushSourceTypeOfflineMessage;
 extern RCIMIWPushSourceType const RCIMIWPushSourceTypeFromAdmin;
 extern RCIMIWPushSourceType const RCIMIWPushSourceTypeLocalMessage;
 
-
+/*!
+ 消息通知监听
+ */
 @protocol RCIMIWNotificationMessageListener <NSObject>
 
-- (void)OnNotificationMessageArrived:(RCIMIWPushType)pushType
+/*!
+ 消息通知到达
+
+ @param pushType 推送渠道类型
+ @param notificationMessage 消息对象
+ */
+- (void)onNotificationMessageArrived:(RCIMIWPushType)pushType
                  notificationMessage:(RCIMIWPushNotificationMessage *)notificationMessage;
 
-- (void)OnNotificationMessageClicked:(RCIMIWPushType)pushType
+/*!
+ 消息通知被点击
+
+ @param pushType 推送渠道类型
+ @param notificationMessage 消息对象
+ */
+- (void)onNotificationMessageClicked:(RCIMIWPushType)pushType
                  notificationMessage:(RCIMIWPushNotificationMessage *)notificationMessage;
+
+@end
+
+/*!
+ 消息接收监听
+ */
+@protocol RCIMIWMessageReceivedListener <NSObject>
+
+/*!
+ 接收消息的回调方法
+
+ @param message 当前接收到的消息
+ @param nLeft 还剩余的未接收的消息数，left>=0
+ @param offline 是否是离线消息
+ @param hasPackage SDK 拉取服务器的消息以包(package)的形式批量拉取，有 package 存在就意味着远端服务器还有消息尚未被 SDK
+ 拉取
+ @discussion 开发者可以根据 nLeft、offline、hasPackage 来决定何时的时机刷新 UI ；建议当 hasPackage=0
+ 并且 nLeft=0 时刷新 UI
+ */
+- (void)onReceived:(RCMessage *)message
+              left:(int)nLeft
+           offline:(BOOL)offline
+        hasPackage:(BOOL)hasPackage;
+@end
+
+/*!
+ 消息已读回执监听
+ */
+@protocol RCIMIWReadReceiptListener <NSObject>
+
+/*!
+ 收到已读回执
+
+ @param identifier 会话标识
+ @param lastMessageSendTime 已阅读的最后一条消息的 sendTime
+ 
+ @discussion 收到这个回调之后可以更新这个会话中 messageTime 以前的消息 UI 为已读（底层数据库消息状态已经改为已读）。
+ */
+- (void)onReadReceiptReceived:(RCConversationIdentifier *)identifier
+          lastMessageSendTime:(long long)lastMessageSendTime;
+
+/*!
+ 请求消息已读回执
+
+ @param identifier 会话标识
+ @param messageUId 请求已读回执的消息ID
+ */
+- (void)onReadReceiptRequest:(RCConversationIdentifier *)identifier
+                  messageUId:(NSString *)messageUId;
+
+/*!
+ 消息已读回执响应
+ 
+ @param identifier 会话标识
+ @param messageUId      请求已读回执的消息ID
+ @param respondUserIdList 已读userId列表
+ */
+- (void)onReadReceiptResponse:(RCConversationIdentifier *)identifier
+                   messageUId:(NSString *)messageUId
+            respondUserIdList:(NSDictionary *)respondUserIdList;
+
+@end
+
+
+@protocol RCIMIWTypingStatusChangedLitener <NSObject>
+
+/*!
+ 用户输入状态变化的回调
+
+ @param identifier    会话标识
+ @param typingStatusList 正在输入的RCIMIWTypingStatus列表（空数组表示当前没有用户正在输入）
+
+ @discussion
+ 当客户端收到用户输入状态的变化时，会回调此接口，通知发生变化的会话以及当前正在输入的RCIMIWTypingStatus列表。
+
+ @warning 目前仅支持单聊。
+ */
+- (void)onTypingStatusChanged:(RCConversationIdentifier *)identifier
+             typingStatusList:(NSArray<RCIMIWTypingStatus *> *)typingStatusList;
 
 @end
 
@@ -80,15 +183,23 @@ typedef void(^RCIMIWOperationCallback)(RCErrorCode code);
 typedef void(^RCIMIWOperationCallbackWithBool)(RCErrorCode code, BOOL flag);
 typedef void(^RCIMIWOperationCallbackWithInt)(RCErrorCode code, int value);
 typedef void(^RCIMIWOperationCallbackWithString)(RCErrorCode code, NSString *string);
+typedef void(^RCIMIWOperationCallbackWithStringList)(RCErrorCode code, NSArray<NSString *> *stringList);
 typedef void(^RCIMIWOperationCallbackWithPushLanguage)(RCErrorCode code, RCPushLauguage pushLang);
 typedef void(^RCIMIWOperationCallbackWithMessage)(RCErrorCode code, RCMessage *message);
 typedef void(^RCIMIWOperationCallbackWithMessageList)(RCErrorCode code, NSArray *messages);
+typedef void(^RCIMIWOperationCallbackWithMessageListAndSyncTime)(RCErrorCode code, NSArray *messages, long long syncTime);
 typedef void(^RCIMIWOperationCallbackWithConversation)(RCErrorCode code, RCConversation *conversation);
 typedef void(^RCIMIWOperationCallbackWithConversationList)(RCErrorCode code, NSArray *conversations);
 typedef void(^RCIMIWOperationCallbackWithConversationIdentifier)(RCErrorCode code, RCConversationIdentifier *identifier);
 typedef void(^RCIMIWOperationCallbackWithSearchConversationResultList)(RCErrorCode code, NSArray<RCSearchConversationResult *> *searchConversationResults);
 typedef void(^RCIMIWOperationCallbackWithConversationNotificationStatus)(RCErrorCode code, RCConversationNotificationStatus status);
 typedef void(^RCIMIWOperationCallbackWithRecallNotificationMessage)(RCErrorCode code, RCRecallNotificationMessage *messageContent);
+typedef void(^RCIMIWOperationCallbackWithTagInfoList)(RCErrorCode code, NSArray<RCTagInfo *> *tagInfos);
+typedef void(^RCIMIWOperationCallbackWithConversationTagInfoList)(RCErrorCode code, NSArray<RCConversationTagInfo *> *conversationTagInfos);
+typedef void(^RCIMIWOperationCallbackWithChatRoomInfo)(RCErrorCode code, RCChatRoomInfo *chatRoomInfo);
+typedef void(^RCIMIWOperationCallbackWithNotificationQuietHourInfo)(RCErrorCode code, NSString *startTime, int spansMin);
+typedef void(^RCIMIWOperationCallbackWithBlackListStatus)(RCErrorCode code, int status);
+typedef void(^RCIMIWOperationCallbackWithChatRoomEntry)(RCErrorCode code, NSDictionary *entry);
 
 
 

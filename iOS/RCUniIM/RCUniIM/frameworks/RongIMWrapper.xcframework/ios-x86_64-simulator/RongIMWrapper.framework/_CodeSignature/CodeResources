@@ -6,55 +6,59 @@
 	<dict>
 		<key>Headers/RCIMIWCommandMessage.h</key>
 		<data>
-		ZQ52UXbOAdfigPH2FHGziwZqfPU=
+		axddndmGt4PvFQjyjMJgVpY9iXo=
 		</data>
 		<key>Headers/RCIMIWConverter.h</key>
 		<data>
-		2tcFF2QxQCl85x6urcAMfmiwvw0=
+		SbCV8wy7SfxAVd6ZtTL0w+eCESQ=
 		</data>
 		<key>Headers/RCIMIWDefine.h</key>
 		<data>
-		FmyCcBBaD7dErYWHZFmUUNwzXhs=
+		jVomLNgDrL3uS5RrXey7TMU2Ms4=
 		</data>
 		<key>Headers/RCIMIWEngine.h</key>
 		<data>
-		HCzSGfMsaj7eU+qHhreiR463PfE=
+		l6OywIbFVJ4lLt6bd+7CdZVvR8M=
 		</data>
 		<key>Headers/RCIMIWEngineSetup.h</key>
 		<data>
-		yJvIW/xyt+7/PmxrigAVL1jpFHk=
+		V9gKdcHXtdqVVKk3V7A24DgeU44=
 		</data>
 		<key>Headers/RCIMIWImageCompressConfig.h</key>
 		<data>
-		7WK7aVAPQUYENqtDkD99KoKlZoA=
+		9GmAawuBL6V8/waVQoUXxdnc14g=
 		</data>
 		<key>Headers/RCIMIWMessageContent.h</key>
 		<data>
-		MlVDCiMBsT/avbkHRcEBPIaHBNw=
+		pdLAdqeqRjU7b35oMvJPtAmnVsw=
 		</data>
 		<key>Headers/RCIMIWNormalMessage.h</key>
 		<data>
-		dovprQVgKElUjkMd56usnPz2Lbo=
+		ubFF2ccsG4KJt+Eds33M+Bm0hEc=
 		</data>
 		<key>Headers/RCIMIWPushNotificationMessage.h</key>
 		<data>
-		shi/Ni1iEM4JuypF+QVvrkelfC8=
+		giwvB8M/jGJRBPjaRf+SnvuNPjk=
 		</data>
 		<key>Headers/RCIMIWStatusMessage.h</key>
 		<data>
-		LsuAf4sUNhY1PP3lphtJRHRXfmk=
+		w5Boj8lxiJ+GIk2BoRh74PrqQEw=
 		</data>
 		<key>Headers/RCIMIWStorageMessage.h</key>
 		<data>
-		lFiInD5zn5libwMvZHx0w8tL/AU=
+		8cbQeCOjvQlJEov1fp61KXYodnI=
+		</data>
+		<key>Headers/RCIMIWTypingStatus.h</key>
+		<data>
+		O1i2tH9rOPDQKWvD5UFfmEPRtoM=
 		</data>
 		<key>Headers/RongIMWrapper.h</key>
 		<data>
-		1gv4zl3JTEKX+BYouhW3Z0UKD5k=
+		QOoSD8lwSEcgRN4HRGG15G8JM6Q=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		AVfHN1OoaK4PwhZdjvTuZZnLPR4=
+		Y5spL2S7vTN/4F92azXFqa3wUgo=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -67,132 +71,143 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			ZQ52UXbOAdfigPH2FHGziwZqfPU=
+			axddndmGt4PvFQjyjMJgVpY9iXo=
 			</data>
 			<key>hash2</key>
 			<data>
-			w4P9G/xC1kTZtnTRphUldOWNv6mIOLUtkQ0Dwyxj6SU=
+			g1ro2ees5icbXAOSfL1j/QiQLnqKUlGzMN1BYPO2y8Q=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWConverter.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			2tcFF2QxQCl85x6urcAMfmiwvw0=
+			SbCV8wy7SfxAVd6ZtTL0w+eCESQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			Z4at3N/ctR77daoY0a+eG61yCBouipwUC5ThtcSJTcc=
+			hLLzonWe4+8hDOeOFoIZQt6H6ZhwH/Gq2Bau+UH8lLQ=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWDefine.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			FmyCcBBaD7dErYWHZFmUUNwzXhs=
+			jVomLNgDrL3uS5RrXey7TMU2Ms4=
 			</data>
 			<key>hash2</key>
 			<data>
-			S5sxx8KM53v03Z+UFiaXuj6Rc3wzIgvMbC6l/bWEXw8=
+			0NOFtb69vfmOSLxirRwewE5zUBRnoxZRrzg0K9Psezc=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWEngine.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			HCzSGfMsaj7eU+qHhreiR463PfE=
+			l6OywIbFVJ4lLt6bd+7CdZVvR8M=
 			</data>
 			<key>hash2</key>
 			<data>
-			a4ZuKdqzB7fZ6UMT2iIazi/HhmdaTL1eQdTvD//uVGY=
+			bGK+apGrmv8g+UeCu5itBWRNTwOIFjBuljrIhtyuYik=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWEngineSetup.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			yJvIW/xyt+7/PmxrigAVL1jpFHk=
+			V9gKdcHXtdqVVKk3V7A24DgeU44=
 			</data>
 			<key>hash2</key>
 			<data>
-			WwOFxDTsd5y3Fb/2uDYz/tSAbJbBvY60oEBZwpSrqQs=
+			67jV5jR7pLh+HMyrchvBov5iXFJ0K+KEbpxES41cuiA=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWImageCompressConfig.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			7WK7aVAPQUYENqtDkD99KoKlZoA=
+			9GmAawuBL6V8/waVQoUXxdnc14g=
 			</data>
 			<key>hash2</key>
 			<data>
-			T5qobD0evP7Y0ZtOkdJHncg3g8lDRWzmenyo/5epAXw=
+			k5rwr4/DV35b3usjqnlDYfjKkIc/4zhywz3JXpX/wOA=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWMessageContent.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			MlVDCiMBsT/avbkHRcEBPIaHBNw=
+			pdLAdqeqRjU7b35oMvJPtAmnVsw=
 			</data>
 			<key>hash2</key>
 			<data>
-			cUiPIlFoZznMI3Nsalfu6JDS//jeoNLSQNz/YnsKWzc=
+			Xl3i2rDpjvjBA6l3fbx+VAhiCcK0El8+DWzdlTg/IwQ=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWNormalMessage.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			dovprQVgKElUjkMd56usnPz2Lbo=
+			ubFF2ccsG4KJt+Eds33M+Bm0hEc=
 			</data>
 			<key>hash2</key>
 			<data>
-			F12ip8NDW07mlsxBBwB6EikQvKjkLckG2hu7UpI+RIU=
+			Rn5rlYFQEOFC0AuXxeDtr611kAmv91yNSqxwuCGQZj0=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWPushNotificationMessage.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			shi/Ni1iEM4JuypF+QVvrkelfC8=
+			giwvB8M/jGJRBPjaRf+SnvuNPjk=
 			</data>
 			<key>hash2</key>
 			<data>
-			jONoPwmkgjzj/vWRK418D1FYhfwIxb47PrYjb/ns4M0=
+			zLMtubEtlgeIJFu1Fhu2nCokibFWCYeQy9dmKDUClrs=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWStatusMessage.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			LsuAf4sUNhY1PP3lphtJRHRXfmk=
+			w5Boj8lxiJ+GIk2BoRh74PrqQEw=
 			</data>
 			<key>hash2</key>
 			<data>
-			e0AyCQ91MrhfQIKRe+2ImiOUgno0lWmAQHqdoyeuAZE=
+			GJ0p0nvE7rXJoJKgl3P7dPGajGdj2r1lQHqx0RDUBww=
 			</data>
 		</dict>
 		<key>Headers/RCIMIWStorageMessage.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			lFiInD5zn5libwMvZHx0w8tL/AU=
+			8cbQeCOjvQlJEov1fp61KXYodnI=
 			</data>
 			<key>hash2</key>
 			<data>
-			mD7LP94vSu9PLlQu/nX/fTkOy/rpUWVy/hFCk0dxF2g=
+			PgJjZ51z00uEv+GTaAvJRoV224VyPR5yQALzocsCEcw=
+			</data>
+		</dict>
+		<key>Headers/RCIMIWTypingStatus.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			O1i2tH9rOPDQKWvD5UFfmEPRtoM=
+			</data>
+			<key>hash2</key>
+			<data>
+			KmgTBl9bBHkOqQC/ZGuBRMK3YMlVoukcOEfQ0yxSn5Y=
 			</data>
 		</dict>
 		<key>Headers/RongIMWrapper.h</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			1gv4zl3JTEKX+BYouhW3Z0UKD5k=
+			QOoSD8lwSEcgRN4HRGG15G8JM6Q=
 			</data>
 			<key>hash2</key>
 			<data>
-			qwXDwPwI5ZmvEHUipj9mZpudfUTYwrwG+HaR6+mZ+LA=
+			P3le+UF3zLK5orxGJVrmZKfV6HvIxTqROvB/eE1dMZo=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

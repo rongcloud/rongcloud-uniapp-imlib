@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
-
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -40,6 +39,7 @@ import io.rong.message.InformationNotificationMessage;
 import io.rong.message.ProfileNotificationMessage;
 import io.rong.message.ReadReceiptMessage;
 import io.rong.message.RecallNotificationMessage;
+import io.rong.message.SightMessage;
 import io.rong.message.TextMessage;
 import io.rong.message.VoiceMessage;
 import io.rong.push.pushconfig.PushConfig;
@@ -50,7 +50,7 @@ class Convert {
     private static final int CUSTOM_NORMAL_MESSAGE = 2;
     private static final int CUSTOM_STATUS_MESSAGE = 3;
 
-    static String getStringFromMap( String key, Map<String, Object> map) {
+    static String getStringFromMap(String key, Map<String, Object> map) {
         if (null == map || !map.containsKey(key))
             return "";
         return map.get(key).toString();
@@ -67,7 +67,7 @@ class Convert {
         if (!TextUtils.isEmpty(appVersion))
             builder = builder.appVersion(appVersion);
 
-        if (!TextUtils.isEmpty(navServer) && !TextUtils.isEmpty(fileServer))
+        if (!TextUtils.isEmpty(navServer) || !TextUtils.isEmpty(fileServer))
             builder = builder.serverInfo(navServer, fileServer);
 
         if (!TextUtils.isEmpty(statisticServer))
@@ -123,7 +123,7 @@ class Convert {
     static Map<String, Object> toJSON(String objectName, MessageContent content) {
 
         Map<String, Object> map = new HashMap<>();
-        if(TextUtils.isEmpty(objectName)) {
+        if (TextUtils.isEmpty(objectName)) {
             return map;
         }
         map.put("objectName", objectName);
@@ -175,6 +175,33 @@ class Convert {
                 map.put("size", file.getSize());
                 map.put("fileType", file.getType());
                 map.put("extra", file.getExtra());
+                break;
+            }
+            case "RC:SightMsg": {
+                SightMessage sight = (SightMessage) content;
+                String local = "";
+                Uri localUri = sight.getLocalPath();
+                if (localUri != null) {
+                    local = localUri.toString();
+                }
+                String remote = "";
+                Uri remoteUri = sight.getMediaUrl();
+                if (remoteUri != null) {
+                    remote = remoteUri.toString();
+                }
+                String thumbnail = "";
+                Uri thumbnailUri = sight.getThumbUri();
+                if (thumbnailUri != null) {
+                    thumbnail = thumbnailUri.toString();
+                }
+                map.put("local", local);
+                map.put("remote", remote);
+                map.put("thumbnail", thumbnail);
+                map.put("name", sight.getName());
+                map.put("base64", sight.getBase64());
+                map.put("size", sight.getSize());
+                map.put("duration", sight.getDuration());
+                map.put("extra", sight.getExtra());
                 break;
             }
             case "RC:VcMsg": {
@@ -325,19 +352,19 @@ class Convert {
         }
 
         if (content != null && content.getUserInfo() != null) {
-            map.put("userInfo", toJSON(content.getUserInfo()));
-
+            map.put("userInfo", toUserInfoJSON(content.getUserInfo()));
         }
         return map;
     }
 
-    static Map<String, Object> toJSON(UserInfo userInfo){
-        if(userInfo == null)
+    static Map<String, Object> toUserInfoJSON(UserInfo userInfo) {
+        if (userInfo == null)
             return null;
         Map<String, Object> map = new HashMap<>();
         map.put("userId", userInfo.getUserId());
         map.put("name", userInfo.getName());
-        map.put("portraitUrl", userInfo.getPortraitUri()==null? "" : userInfo.getPortraitUri().toString());
+        map.put("portraitUrl", userInfo.getPortraitUri() == null ? "" : userInfo.getPortraitUri().toString());
+        map.put("extra", userInfo.getExtra() != null ? userInfo.getExtra() : "");
         return map;
     }
 
@@ -428,9 +455,17 @@ class Convert {
                     }
                     break;
                 case "RC:FileMsg":
-                    messageContent = FileMessage.obtain(Utils.getFileUri(context, (String) map.get("local")));
+                    String path = (String) map.get("local");
+                    assert path != null;
+                    messageContent = FileMessage.obtain(context, Uri.parse("file://" + path));
                     if (map.containsKey("extra")) {
                         ((FileMessage) messageContent).setExtra((String) map.get("extra"));
+                    }
+                    break;
+                case "RC:SightMsg":
+                    messageContent = SightMessage.obtain(context, Uri.parse("file://" + (String) map.get("local")), (Integer) map.get("duration"));
+                    if (map.containsKey("extra")) {
+                        ((SightMessage) messageContent).setExtra((String) map.get("extra"));
                     }
                     break;
                 case "RC:VcMsg":
@@ -492,6 +527,9 @@ class Convert {
                         (String) userInfoMap.get("userId"),
                         (String) userInfoMap.get("name"),
                         Uri.parse((String) userInfoMap.get("portraitUrl")));
+                if (userInfoMap.containsKey("extra")) {
+                    userInfo.setExtra((String) userInfoMap.get("extra"));
+                }
                 messageContent.setUserInfo(userInfo);
             }
         }

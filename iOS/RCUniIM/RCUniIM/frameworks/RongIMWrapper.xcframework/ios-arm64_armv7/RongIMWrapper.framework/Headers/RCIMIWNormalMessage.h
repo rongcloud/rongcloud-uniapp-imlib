@@ -2,7 +2,7 @@
 //  RCIMIWNormalMessage.h
 //  RongIMWrapper
 //
-//  Created by joyoki on 2021/12/20.
+//  Created by RongCloud on 2021/12/20.
 //
 
 #import <RongIMWrapper/RCIMIWMessageContent.h>

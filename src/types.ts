@@ -307,6 +307,21 @@ export interface FileMessage extends MessageContent {
 }
 
 /**
+ * 小视频信息
+ */
+export interface SightMessage extends MessageContent {
+  objectName: ObjectName.Sight;
+  local: string;
+  remote?: string;
+  thumbnail?: string;
+  name?: string;
+  base64?: string;
+  size?: number;
+  duration: number;
+  extra?: string;
+}
+
+/**
  * 位置消息
  */
 export interface LocationMessage extends MessageContent {
@@ -927,6 +942,15 @@ export interface TypingStatus {
   targetId: string;
   userId: string;
   typingContentType: string;
+}
+
+/**
+ * 消息已读回执
+ */
+export interface ReadReceipt {
+  conversationType: ConversationType;
+  targetId: string;
+  messageTime: number;
 }
 
 /**

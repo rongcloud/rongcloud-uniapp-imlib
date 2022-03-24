@@ -34,7 +34,9 @@ import io.rong.imlib.model.MessageContent;
 import io.rong.imlib.model.SearchConversationResult;
 import io.rong.imlib.typingmessage.TypingStatus;
 import io.rong.message.MediaMessageContent;
+import io.rong.message.ReadReceiptMessage;
 import io.rong.message.RecallNotificationMessage;
+import io.rong.message.SightMessage;
 import io.rong.push.RongPushClient;
 import io.rong.push.pushconfig.PushConfig;
 
@@ -63,13 +65,14 @@ public class RCUniIM extends UniModule {
         if (isValidContext()) {
             RongCoreClient.init(mUniSDKInstance.getContext(), appKey);
 
-            List<Class<? extends MessageContent>> customMessageList = new ArrayList<>();
-            customMessageList.add(RCCommandMessage.class);
-            customMessageList.add(RCStorageMessage.class);
-            customMessageList.add(RCNormalMessage.class);
-            customMessageList.add(RCStatusMessage.class);
+            List<Class<? extends MessageContent>> registerMessageList = new ArrayList<>();
+            registerMessageList.add(RCCommandMessage.class);
+            registerMessageList.add(RCStorageMessage.class);
+            registerMessageList.add(RCNormalMessage.class);
+            registerMessageList.add(RCStatusMessage.class);
+            registerMessageList.add(SightMessage.class);
 
-            RongCoreClient.registerMessageType(customMessageList);
+            RongCoreClient.registerMessageType(registerMessageList);
 
             registerEventListener();
         }
@@ -81,13 +84,14 @@ public class RCUniIM extends UniModule {
             RCIMIWEngineSetup setup = Convert.toEngineSetup(engineSetup);
             RCIMIWEngine.init(mUniSDKInstance.getContext(), appKey, setup);
 
-            List<Class<? extends MessageContent>> customMessageList = new ArrayList<>();
-            customMessageList.add(RCCommandMessage.class);
-            customMessageList.add(RCStorageMessage.class);
-            customMessageList.add(RCNormalMessage.class);
-            customMessageList.add(RCStatusMessage.class);
+            List<Class<? extends MessageContent>> registerMessageList = new ArrayList<>();
+            registerMessageList.add(RCCommandMessage.class);
+            registerMessageList.add(RCStorageMessage.class);
+            registerMessageList.add(RCNormalMessage.class);
+            registerMessageList.add(RCStatusMessage.class);
+            registerMessageList.add(SightMessage.class);
 
-            RongCoreClient.registerMessageType(customMessageList);
+            RongCoreClient.registerMessageType(registerMessageList);
 
             registerEventListener();
         }
@@ -143,7 +147,9 @@ public class RCUniIM extends UniModule {
             @Override
             public void onReadReceiptReceived(Message message) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("message", message);
+                map.put("targetId", message.getTargetId());
+                map.put("conversationType", message.getConversationType().getValue());
+                map.put("messageTime", ((ReadReceiptMessage) message.getContent()).getLastMessageSendTime());
                 if (mUniSDKInstance != null) {
                     mUniSDKInstance.fireModuleEvent("rcimlib-read-receipt-received", RCUniIM.this, map);
                 }
@@ -399,7 +405,7 @@ public class RCUniIM extends UniModule {
     }
 
     @UniJSMethod()
-    public void insertOutgoingMessage(int type, String targetId, int status, Map<String, Object> content, int sentTime, final UniJSCallback uniJSCallback) {
+    public void insertOutgoingMessage(int type, String targetId, int status, Map<String, Object> content, long sentTime, final UniJSCallback uniJSCallback) {
         MessageContent messageContent = toMessageContent(mUniSDKInstance.getContext(), content);
         Message.SentStatus sentStatus = Message.SentStatus.setValue(status);
         Conversation.ConversationType conversationType = Conversation.ConversationType.setValue(type);
@@ -413,7 +419,7 @@ public class RCUniIM extends UniModule {
     }
 
     @UniJSMethod()
-    public void insertIncomingMessage(int type, String targetId, String senderId, int status, Map<String, Object> content, int sentTime, final UniJSCallback uniJSCallback) {
+    public void insertIncomingMessage(int type, String targetId, String senderId, int status, Map<String, Object> content, long sentTime, final UniJSCallback uniJSCallback) {
         MessageContent messageContent = toMessageContent(mUniSDKInstance.getContext(), content);
         Message.ReceivedStatus receivedStatus = new Message.ReceivedStatus(status);
         Conversation.ConversationType conversationType = Conversation.ConversationType.setValue(type);

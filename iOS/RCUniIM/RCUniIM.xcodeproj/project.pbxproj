@@ -10,6 +10,7 @@
 		3E3308AC275DBE62004B2E4E /* RCUniIM.m in Sources */ = {isa = PBXBuildFile; fileRef = 3E3308AA275DBE61004B2E4E /* RCUniIM.m */; };
 		3E3308AD275DBE62004B2E4E /* RCUniIM.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E3308AB275DBE61004B2E4E /* RCUniIM.h */; };
 		3E3308B1275DBE6C004B2E4E /* RongChatRoom.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E3308AF275DBE6C004B2E4E /* RongChatRoom.xcframework */; };
+		3E61B49F27C4CF76004E10A8 /* RongLocation.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E61B49E27C4CF76004E10A8 /* RongLocation.xcframework */; };
 		DC6BBAFC2771B3640070B04C /* RongIMWrapper.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC6BBAFB2771B3640070B04C /* RongIMWrapper.xcframework */; };
 		DCC943662771E50700A67A5F /* RongIMLibCore.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCC943652771E50700A67A5F /* RongIMLibCore.xcframework */; };
 /* End PBXBuildFile section */
@@ -18,6 +19,7 @@
 		3E3308AA275DBE61004B2E4E /* RCUniIM.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RCUniIM.m; sourceTree = "<group>"; };
 		3E3308AB275DBE61004B2E4E /* RCUniIM.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RCUniIM.h; sourceTree = "<group>"; };
 		3E3308AF275DBE6C004B2E4E /* RongChatRoom.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = RongChatRoom.xcframework; sourceTree = "<group>"; };
+		3E61B49E27C4CF76004E10A8 /* RongLocation.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = RongLocation.xcframework; sourceTree = "<group>"; };
 		9A7B19E926CA0E4B00816910 /* RCUniIM.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RCUniIM.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A7B19ED26CA0E4B00816910 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC6BBAFB2771B3640070B04C /* RongIMWrapper.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = RongIMWrapper.xcframework; sourceTree = "<group>"; };
@@ -31,6 +33,7 @@
 			files = (
 				3E3308B1275DBE6C004B2E4E /* RongChatRoom.xcframework in Frameworks */,
 				DCC943662771E50700A67A5F /* RongIMLibCore.xcframework in Frameworks */,
+				3E61B49F27C4CF76004E10A8 /* RongLocation.xcframework in Frameworks */,
 				DC6BBAFC2771B3640070B04C /* RongIMWrapper.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -53,6 +56,7 @@
 				DCC943652771E50700A67A5F /* RongIMLibCore.xcframework */,
 				DC6BBAFB2771B3640070B04C /* RongIMWrapper.xcframework */,
 				3E3308AF275DBE6C004B2E4E /* RongChatRoom.xcframework */,
+				3E61B49E27C4CF76004E10A8 /* RongLocation.xcframework */,
 			);
 			path = frameworks;
 			sourceTree = "<group>";

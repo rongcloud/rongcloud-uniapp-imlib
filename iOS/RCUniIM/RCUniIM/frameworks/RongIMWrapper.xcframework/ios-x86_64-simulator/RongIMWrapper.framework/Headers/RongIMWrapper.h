@@ -2,7 +2,7 @@
 //  RongIMWrapper.h
 //  RongIMWrapper
 //
-//  Created by joyoki on 2021/12/15.
+//  Created by RongCloud on 2021/12/15.
 //
 
 #import <Foundation/Foundation.h>
